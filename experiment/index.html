@@ -4,6 +4,10 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <title>Chromostereopsis - Illusion Game pilot</title>
+        <!-- DataPipe's client (datapipe-client 0.2.0), vendored rather than fetched from unpkg so
+             that the code participants run is the code that was checked. The only file here that
+             is not ours; see README.md > Saving. -->
+        <script src="vendor/datapipe-client.js"></script>
         <script src="stimulus.js"></script>
         <script src="design.js"></script>
         <script src="experiment.js"></script>
@@ -300,6 +304,15 @@
             label.inline input {
                 margin-right: 8px;
             }
+            #save-note {
+                color: #aaa;
+            }
+            #save-note.done {
+                color: #7c7;
+            }
+            #save-note.failed {
+                color: #e77;
+            }
             #data-preview {
                 width: 90vw;
                 max-width: 900px;
@@ -500,6 +513,7 @@
             <div class="text" style="text-align: center">
                 <h1>Thank you!</h1>
                 <div id="end-summary"></div>
+                <p id="save-note">Saving your data...</p>
                 <p>
                     <button id="download-csv">Download data (CSV)</button>
                     <button id="download-json">Download data (JSON)</button>

@@ -47,3 +47,7 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Sessions pulled off Zenodo by data/download.py: participant data, never committed (public repo)
+data/raw/
+__pycache__/

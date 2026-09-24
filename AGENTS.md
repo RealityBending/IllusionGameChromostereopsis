@@ -32,7 +32,7 @@ this study is **viability screening**, not effect estimation.
 | Where | What |
 | ----- | ---- |
 | `Pyllusion/pyllusion/Chromostereopsis/` | The stimulus. `Chromostereopsis.py` holds the literature review, the mechanisms, the candidate design and the open questions; `chromostereopsis_parameters.py` computes the parameter dictionary; `chromostereopsis_image.py` renders it. Still a **prototype**, not in the public API. |
-| `IllusionGame/chromostereopsis/` | The pilot experiment: dependency-free HTML/JS, `stimulus.js` being a port of the Pyllusion parameter and image functions (so a trial can be re-rendered from its recorded `Seed`). `design.js` holds `DESIGN` and builds the trial list. See its `README.md`. |
+| `experiment/` (this repo) | The pilot experiment: dependency-free HTML/JS, `stimulus.js` being a port of the Pyllusion parameter and image functions (so a trial can be re-rendered from its recorded `Seed`). `design.js` holds `DESIGN` and builds the trial list. See its `README.md`. Served by GitHub Pages at <https://realitybendinglab.com/IllusionGameChromostereopsis/experiment/>, so anything pushed to `main` is live. |
 | this repo | The data (`data/pilots/`) and the analysis (`analysis/`). |
 
 ## The task
@@ -128,16 +128,29 @@ fitted to the viewport (4:3, at most 90% of the window) rather than to a fixed v
 
 ## Data
 
-`data/pilots/chromostereopsis_<participant_id>.json`, one file per session, as downloaded
-from the end screen of the task. Each is a single container with `session`, `demographics`,
-`design` (the `DESIGN` object the trials were built from) and `trials` — one entry per trial
-carrying the response, the RT, and the **full Pyllusion parameter dictionary** for that
-trial, including all the derived luminance and area quantities. The task also offers a
-flat CSV download of the same thing; the JSON is what is kept here, since it is the lossless
-version.
+One JSON file per session, a single container with `session`, `demographics`, `design` (the
+`DESIGN` object the trials were built from) and `trials` — one entry per trial carrying the
+response, the RT, and the **full Pyllusion parameter dictionary** for that trial, including all
+the derived luminance and area quantities. The task also offers a flat CSV download of the same
+thing; the JSON is what is kept, since it is the lossless version.
 
-`analysis/analysis.qmd` reads every JSON in that folder and flattens them into one tidy
-trial-level dataframe. R, tidyverse + easystats, as in the other Illusion Game repos.
+Sessions reach this repo two ways:
+
+- **Zenodo, through DataPipe** (the normal route; experiment `Xykm83c1D95D`, deposit
+  `zenodo.org/uploads/22944626`). The task streams one record per trial into a DataPipe session
+  and sends the whole container at the end, as
+  `[test_]chromostereopsis_<start, UTC>_<participant_id>.json`; someone who stops partway
+  leaves a `<name>-<id>.partial.json` (a bare array of `frame` and `trial` records) instead.
+  `data/download.py` (adapted from TestYourself's, standard library only) pulls the deposit
+  into `data/raw/`, which is **git-ignored**: this repo is public and served by GitHub Pages,
+  so participant data must never be committed. Details in `experiment/README.md` > Saving.
+  The client is vendored at `experiment/vendor/datapipe-client.js` (0.2.0, hash in that
+  README); do not swap it for a CDN tag.
+- **By hand**: files downloaded from the end screen go in `data/pilots/`.
+
+`analysis/analysis.qmd` reads every JSON in both folders — skipping `test_` runs and
+`.partial.json` files — and flattens them into one tidy trial-level dataframe. R, tidyverse +
+easystats, as in the other Illusion Game repos.
 
 ## Status
 

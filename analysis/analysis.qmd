@@ -27,15 +27,20 @@ library(patchwork)
 
 ## Data
 
-Each session of the task (`IllusionGame/chromostereopsis/`) is downloaded as one JSON
-container with `session`, `demographics`, `design` and `trials`. Every trial carries the
-full Pyllusion parameter dictionary it was rendered from, so the design does not have to be
-reconstructed here - it is read off the trials.
+Each session of the task (`experiment/`) is saved as one JSON container with `session`,
+`demographics`, `design` and `trials`. Every trial carries the full Pyllusion parameter
+dictionary it was rendered from, so the design does not have to be reconstructed here - it is
+read off the trials.
+
+Sessions come from two places: `data/pilots/` (files downloaded from the task's end screen, in
+the repo) and `data/raw/` (sessions saved to Zenodo through DataPipe, fetched by
+`data/download.py`, git-ignored). Test runs (`test_...`) and the partial files of people who
+stopped partway (`....partial.json`, a different format) are left out.
 
 ```{r}
 #| code-fold: false
 
-path <- "../data/pilots"
+path <- c("../data/pilots", "../data/raw")
 ```
 
 ### Reading one session
@@ -76,6 +81,7 @@ read_session <- function(file) {
 #| code-fold: false
 
 files <- list.files(path, pattern = "\\.json$", full.names = TRUE)
+files <- files[!grepl("\\.partial\\.json$", files) & !startsWith(basename(files), "test_")]
 
 df <- map(files, read_session) |>
   list_rbind() |>

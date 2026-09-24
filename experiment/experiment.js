@@ -30,6 +30,15 @@ const Experiment = (() => {
     let trials = []
     let canvasSize = { width: 800, height: 600 }
 
+    // A test run (`?test` in the URL, or the page opened from disk or a local server) is saved like
+    // any other, but under a name starting `test_` and with `test: true` in the session, so it can
+    // be told apart from participants' data (data/download.py counts it separately)
+    const isTest =
+        new URLSearchParams(location.search).has("test") ||
+        location.protocol === "file:" ||
+        ["localhost", "127.0.0.1", ""].includes(location.hostname)
+    log.session.test = isTest
+
     const isTouch = navigator.maxTouchPoints > 0 || "ontouchstart" in window
 
     // --- Screens --------------------------------------------------------------------------------
@@ -248,6 +257,7 @@ const Experiment = (() => {
             mask_duration: maskDuration,
             parameters: params,
         })
+        stage("trial", log.trials[log.trials.length - 1])
         await sleep(200) // short blank between the mask and the next fixation
     }
 
@@ -280,9 +290,81 @@ const Experiment = (() => {
         }
     }
 
+    // --- Saving to Zenodo, through DataPipe (pipe.jspsych.org) -----------------------------------
+    // The experiment ID is bound, on DataPipe, to this project's Zenodo deposit, into which DataPipe
+    // files what it is sent. The session goes there in two ways:
+    //   - As it runs: when the trials start, a "frame" record (session, demographics, design), then
+    //     one "trial" record per trial, into a DataPipe session. If the participant leaves before the
+    //     end, DataPipe files what it holds, about 15 minutes later, as `<FILENAME>-<id>.partial.json`:
+    //     a bare JSON array of those records.
+    //   - At the end: the whole `log` container, exactly as the JSON download, under FILENAME. Sending
+    //     it with the session and closing the session as submitted tells DataPipe to drop the staged
+    //     records instead of filing them as a partial.
+    // The staging is best-effort: if the client is missing or the session will not start, the trials
+    // run as usual and only the final file is attempted.
+    const DATAPIPE_EXPERIMENT = "Xykm83c1D95D"
+
+    // `chromostereopsis_<start, UTC>_<participant_id>.json`: the start time makes the name unique
+    // (DataPipe refuses a filename it already has) and lists the deposit in chronological order
+    const FILENAME =
+        (isTest ? "test_" : "") +
+        "chromostereopsis_" +
+        log.session.start_time.replace(/[-:]/g, "").slice(0, 15) + // 20260924T141530
+        "_" +
+        log.session.participant_id +
+        ".json"
+
+    let session = null
+
+    // Opened when the trials start rather than on page load, so that someone who only read the
+    // consent form does not hold one of the experiment's concurrent sessions
+    function openSession() {
+        if (!window.DataPipe) return console.warn("DataPipe client not loaded: data will only be sent at the end")
+        try {
+            session = DataPipe.createSession({ experiment_id: DATAPIPE_EXPERIMENT, filename: FILENAME })
+        } catch (error) {
+            console.warn("DataPipe session could not start:", error)
+            return
+        }
+        stage("frame", { session: Object.assign({}, sessionInfo(false)), demographics: log.demographics, design: log.design })
+    }
+
+    function stage(kind, body) {
+        if (!session) return
+        try {
+            session.record(Object.assign({ record: kind }, body))
+        } catch (error) {
+            console.warn("DataPipe record failed:", error)
+        }
+    }
+
+    async function save(json) {
+        let result = { ok: false }
+        try {
+            if (!window.DataPipe) throw new Error("DataPipe client not loaded")
+            const body = { experiment_id: DATAPIPE_EXPERIMENT, filename: FILENAME, data: json }
+            // The session itself rather than its id: the client waits for it to have started (not
+            // for the staged records to be flushed) and attaches the id to the request
+            result = await DataPipe.saveData(session ? Object.assign(body, { session: session }) : body)
+        } catch (error) {
+            console.warn("DataPipe save failed:", error)
+        }
+        // Not awaited: the file has gone, and closing only tidies up the staged copy
+        if (session) session.close({ submitted: result.ok }).catch(() => {})
+        // A refusal carries a reason (FILE_EXISTS, EXPERIMENT_FINALIZED, ...) in `body`
+        if (!result.ok) console.warn("DataPipe did not accept the file:", result.status, result.body)
+
+        const note = document.getElementById("save-note")
+        note.className = result.ok ? "done" : "failed"
+        note.textContent = result.ok
+            ? "Your data has been saved. You can now close this page."
+            : "Your data could not be sent. Please download it with the buttons below and send it to the experimenter."
+    }
+
     // --- Data export ----------------------------------------------------------------------------
-    function sessionInfo() {
-        return Object.assign(log.session, {
+    // With `ended` false (the frame staged at the start), the device info without an end time
+    function sessionInfo(ended = true) {
+        Object.assign(log.session, {
             touch_device: isTouch,
             canvas_width: canvasSize.width,
             canvas_height: canvasSize.height,
@@ -293,8 +375,9 @@ const Experiment = (() => {
             device_pixel_ratio: window.devicePixelRatio,
             fullscreen: document.fullscreenElement !== null,
             user_agent: navigator.userAgent,
-            end_time: new Date().toISOString(),
         })
+        if (ended) log.session.end_time = new Date().toISOString()
+        return log.session
     }
 
     // Flat version: one row per trial, session and demographics repeated, parameters spread out
@@ -340,13 +423,14 @@ const Experiment = (() => {
         if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
         sessionInfo()
         const json = JSON.stringify(log, null, 2)
-        const name = "chromostereopsis_" + log.session.participant_id
+        const name = FILENAME.replace(/\.json$/, "") // the downloads carry the deposit's name
         document.getElementById("end-summary").innerHTML = summary(log.trials)
         document.getElementById("data-preview").value = json
         document.getElementById("download-json").onclick = () => download(name + ".json", json, "application/json")
         document.getElementById("download-csv").onclick = () => download(name + ".csv", toCSV(flatRows()), "text/csv")
         show("screen-end")
         window.CHROMOSTEREOPSIS_DATA = log // also reachable from the console
+        save(json)
     }
 
     // --- Flow -----------------------------------------------------------------------------------
@@ -372,6 +456,7 @@ const Experiment = (() => {
                 n_blocks: DESIGN.n_blocks, difference: DESIGN.difference,
                 illusion_strength: DESIGN.illusion_strength, factors: DESIGN.factors, fixed: DESIGN.fixed,
                 fixation_duration: DESIGN.fixation_duration, mask: DESIGN.mask }
+            openSession()
             await runBlocks()
             finish()
         }

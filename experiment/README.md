@@ -4,7 +4,9 @@ A minimal online paradigm, in plain HTML and JavaScript with no dependencies, to
 chromostereopsis stimulus developed in
 [Pyllusion](https://github.com/RealityBending/Pyllusion) (`pyllusion/Chromostereopsis/`).
 
-Open `index.html` in a browser (no server needed). Responses are given with the arrow keys or,
+Live at <https://realitybendinglab.com/IllusionGameChromostereopsis/experiment/> (GitHub Pages,
+so whatever is on `main` is what participants get), or open `index.html` in a browser (no server
+needed; such a run is saved as a test, see **Saving**). Responses are given with the arrow keys or,
 on a touch screen, by tapping the left or right half of the screen (any tap continues from a break).
 
 ## The task
@@ -17,8 +19,9 @@ between the red disc being on the left or on the right. No subjective depth repo
 
 Flow: consent (placeholder text; its button requests full screen) > demographics > instructions,
 with two worked examples and the correct key animated > trials in blocks, with a per-block progress
-bar and a break screen between blocks > end screen with the data as JSON / CSV downloads (also
-printed in a text box and available as `window.CHROMOSTEREOPSIS_DATA`).
+bar and a break screen between blocks > end screen, which saves the data to Zenodo (see **Saving**)
+and says whether that worked, and also offers it as JSON / CSV downloads (printed in a text box
+too, and available as `window.CHROMOSTEREOPSIS_DATA`).
 
 ## Files
 
@@ -29,8 +32,9 @@ printed in a text box and available as `window.CHROMOSTEREOPSIS_DATA`).
   `equiluminant` holds at every strength. A trial can be re-rendered from its recorded `Seed`.
 - `design.js`: `DESIGN` (total trials, blocks, difference levels, factors and their levels, fixed
   parameters) and `makeTrials()`, which builds the trial list.
-- `experiment.js`: screens, timing, data.
+- `experiment.js`: screens, timing, data, saving.
 - `index.html`: the page, including the demographics form and the instruction text.
+- `vendor/datapipe-client.js`: DataPipe's client, the one file here that is not ours (see **Saving**).
 
 ## Design
 
@@ -81,7 +85,7 @@ The session is logged as one JSON container:
 
 ```
 {
-  "session":      { participant_id (random 8-character string), start_time / consent_time /
+  "session":      { participant_id (random 8-character string), test (see Saving), start_time / consent_time /
                     end_time (ISO, UTC), date and time (local) and timezone, touch_device, canvas
                     and window size, screen size, device pixel ratio, full-screen state, user agent },
   "demographics": { sex, age, glasses, correction_type, correction_now, colour_vision,
@@ -114,6 +118,49 @@ equiluminant + dither_size + size_panel) + (1 | participant)`, logistic. The ill
 `difference x illusion_strength` interaction: with the red disc on the left, an irradiation-type
 bias makes "left larger" errors more likely when the right disc is objectively larger, while a
 constancy-type bias does the opposite.
+
+## Saving
+
+Sessions are saved to this project's Zenodo deposit (<https://zenodo.org/uploads/22944626>)
+through [DataPipe](https://pipe.jspsych.org) (experiment `Xykm83c1D95D`, `DATAPIPE_EXPERIMENT` in
+`experiment.js`), following what TestYourself does. The session goes there twice, in two ways:
+
+- **As it runs**, into a DataPipe session opened when the trials start: one `"record": "frame"`
+  (`session`, `demographics`, `design`), then one `"record": "trial"` per trial (the trial object
+  above). If the participant leaves before the end, DataPipe files what it holds about 15 minutes
+  later as `<name>-<id>.partial.json`, a bare JSON array of those records, so an abandoned session
+  still leaves its trials.
+- **At the end**, the whole container, exactly as the JSON download, sent with the session. The
+  session is then closed as submitted, which tells DataPipe to drop the staged records rather than
+  file them as a partial next to the complete file.
+
+The file is named `chromostereopsis_<start time, UTC>_<participant_id>.json`; the start time keeps
+it unique (DataPipe refuses a name it already has) and sorts the deposit chronologically. The
+downloads use the same name. A **test run** (`?test` in the URL, or the page opened from disk or
+`localhost`) is saved like any other but prefixed `test_`, with `"test": true` in `session`.
+
+The staging is best-effort: if the client is missing or the session cannot start, the trials run
+as usual and only the final file is sent. The end screen says "saved" or asks the participant to
+download the file and send it on. "Saved" means DataPipe accepted the file; it can take a while to
+appear on Zenodo.
+
+While collecting, the deposit is an unpublished **draft**, readable only by its owner. Do not
+publish it during collection (DataPipe writes into the draft); when collection is over,
+**finalise** the experiment on DataPipe first, and only then publish the Zenodo record.
+
+**The client** is DataPipe's `datapipe-client@0.2.0`, kept in `vendor/` rather than loaded from
+unpkg, so the code participants run cannot change under a running study. It is the same file
+TestYourself vendors, from
+`https://unpkg.com/datapipe-client@0.2.0/dist/datapipe-client.browser.global.js`, sha256
+`b2af030b77d8ccc6619582691dd94022b8d388230186b1a24cc736939774310c`. To update, download the new
+version by hand and write its version and hash here. It adds DataPipe's limits: 16 KiB per record
+(a trial is about 1.7 KB), 1,000 records per session (the design has 200 trials) and 24 hours per
+session.
+
+**Getting the data back**: `python data/download.py` (from the repository root) fetches the
+deposit into `data/raw/` (git-ignored), checks each file's checksum, and counts complete sessions,
+partials and test runs. It needs a Zenodo token (`ZENODO_TOKEN`, or `~/.zenodo_token`) because the
+deposit is a draft; see the script's header.
 
 ## Caveats
 
