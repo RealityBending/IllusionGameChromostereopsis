@@ -85,9 +85,12 @@ The session is logged as one JSON container:
 
 ```
 {
-  "session":      { participant_id (random 8-character string), test (see Saving), start_time / consent_time /
-                    end_time (ISO, UTC), date and time (local) and timezone, touch_device, canvas
-                    and window size, screen size, device pixel ratio, full-screen state, user agent },
+  "session":      { participant_id (random 8-character string), test (see Saving), start_time /
+                    consent_time / end_time (ISO, UTC), date and time (local) and timezone,
+                    touch_device (the device can take touch), input_wording ("keyboard" or
+                    "touch": which instructions were shown, from the demographics' device),
+                    canvas and window size, screen size, device pixel ratio, full-screen state,
+                    user agent },
   "demographics": { sex, age, glasses, correction_type, correction_now, colour_vision,
                     depth_vision, device, viewing_distance, lighting },
   "design":       { the DESIGN object the trials were built from },

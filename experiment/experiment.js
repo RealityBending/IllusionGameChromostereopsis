@@ -39,7 +39,13 @@ const Experiment = (() => {
         ["localhost", "127.0.0.1", ""].includes(location.hostname)
     log.session.test = isTest
 
-    const isTouch = navigator.maxTouchPoints > 0 || "ontouchstart" in window
+    // Whether the device *can* take touch (logged as `touch_device`). Not used for the wording: it is
+    // also true of touchscreen laptops, whose users have a keyboard and use it.
+    const hasTouch = navigator.maxTouchPoints > 0 || "ontouchstart" in window
+    // Whether the instructions speak of tapping or of keys (logged as `input_wording`). A first guess
+    // from the primary pointer (a finger rather than a mouse or trackpad), replaced by the device
+    // answered in the demographics. Taps and keys are accepted either way; this is only the wording.
+    let isTouch = window.matchMedia?.("(pointer: coarse)").matches ?? hasTouch
 
     // --- Screens --------------------------------------------------------------------------------
     function show(id) {
@@ -47,8 +53,11 @@ const Experiment = (() => {
         document.getElementById(id).style.display = "flex"
     }
 
-    // Show the keyboard or the touch wording of the instructions
-    function applyInputWording() {
+    // Show the keyboard or the touch wording of the instructions. Laptop/desktop get the keyboard
+    // wording and tablet/phone the touch one; "other" keeps the pointer-based guess.
+    function applyInputWording(device) {
+        if (device === "laptop" || device === "desktop") isTouch = false
+        if (device === "tablet" || device === "phone") isTouch = true
         document.querySelectorAll(".kb-only").forEach((e) => (e.style.display = isTouch ? "none" : ""))
         document.querySelectorAll(".touch-only").forEach((e) => (e.style.display = isTouch ? "" : "none"))
     }
@@ -365,7 +374,8 @@ const Experiment = (() => {
     // With `ended` false (the frame staged at the start), the device info without an end time
     function sessionInfo(ended = true) {
         Object.assign(log.session, {
-            touch_device: isTouch,
+            touch_device: hasTouch,
+            input_wording: isTouch ? "touch" : "keyboard",
             canvas_width: canvasSize.width,
             canvas_height: canvasSize.height,
             window_width: window.innerWidth,
@@ -446,6 +456,7 @@ const Experiment = (() => {
         document.getElementById("demographics-form").onsubmit = (event) => {
             event.preventDefault()
             log.demographics = readDemographics()
+            applyInputWording(log.demographics.device)
             drawExamples()
             show("screen-instructions")
         }
@@ -465,7 +476,7 @@ const Experiment = (() => {
         show("screen-consent")
     }
 
-    return { start, log, isTouch, get trials() { return trials } }
+    return { start, log, get isTouch() { return isTouch }, get trials() { return trials } }
 })()
 
 document.addEventListener("DOMContentLoaded", Experiment.start)
