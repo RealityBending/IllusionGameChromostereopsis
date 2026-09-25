@@ -20,7 +20,7 @@ const DESIGN = {
     // Task difficulty: magnitude of the objective area difference between the two discs (as in
     // Pyllusion's Delboeuf: 0.1 = the larger disc has 10% more area, 1 = twice the area, i.e. 1.41x
     // the diameter). Never zero, so every trial has a correct answer. The sign is balanced separately.
-    difference: [0.05, 0.1, 0.25, 0.5],
+    difference: [0.025, 0.05, 0.1, 0.25, 0.5],
 
     // Illusion strength: +/-1 = pure colours, sign = which panel gets the red-leaning disc; 0 = both
     // panels the same purple (no colour context at all: each participant's baseline left/right
@@ -100,7 +100,10 @@ function makeSet(design) {
     for (const strength of design.illusion_strength) {
         const signs = balancedLevels([-1, 1], design.difference.length)
         design.difference.forEach((magnitude, i) => {
-            cells.push({ illusion_strength: strength, difference: signs[i] * magnitude })
+            cells.push({
+                illusion_strength: strength,
+                difference: signs[i] * magnitude,
+            })
         })
     }
     return shuffle(cells)
@@ -129,17 +132,28 @@ function repairExclusions(design, cells, columns) {
         for (const name of shuffle(names)) {
             for (const j of shuffle([...cells.keys()])) {
                 if (j === i || columns[name][j] === columns[name][i]) continue
-                ;[columns[name][i], columns[name][j]] = [columns[name][j], columns[name][i]]
-                if (!isExcluded(design, trialOptions(cells, columns, i)) && !isExcluded(design, trialOptions(cells, columns, j))) {
+                ;[columns[name][i], columns[name][j]] = [
+                    columns[name][j],
+                    columns[name][i],
+                ]
+                if (
+                    !isExcluded(design, trialOptions(cells, columns, i)) &&
+                    !isExcluded(design, trialOptions(cells, columns, j))
+                ) {
                     repaired = true
                     break
                 }
-                ;[columns[name][i], columns[name][j]] = [columns[name][j], columns[name][i]] // undo
+                ;[columns[name][i], columns[name][j]] = [
+                    columns[name][j],
+                    columns[name][i],
+                ] // undo
             }
             if (repaired) break
         }
         if (!repaired) {
-            throw new Error("Could not build a trial list that satisfies the exclusion rules; relax them or add levels.")
+            throw new Error(
+                "Could not build a trial list that satisfies the exclusion rules; relax them or add levels.",
+            )
         }
     }
 }
@@ -157,8 +171,12 @@ function makeTrials(design, width, height) {
         }
         repairExclusions(design, cells, columns)
         cells.forEach((cell, i) => {
-            const options = Object.assign({}, design.fixed, cell, { width: width, height: height })
-            for (const name of Object.keys(columns)) options[name] = columns[name][i]
+            const options = Object.assign({}, design.fixed, cell, {
+                width: width,
+                height: height,
+            })
+            for (const name of Object.keys(columns))
+                options[name] = columns[name][i]
             options.seed = randomInteger(0, 2 ** 31 - 1)
             // Fail before the session starts rather than in the middle of a block if a combination
             // of levels cannot be rendered (e.g. a disc that does not fit its panel)

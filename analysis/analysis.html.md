@@ -29,16 +29,21 @@ library(patchwork)
 
 ## Data
 
-Each session of the task (`IllusionGame/chromostereopsis/`) is downloaded as one JSON
-container with `session`, `demographics`, `design` and `trials`. Every trial carries the
-full Pyllusion parameter dictionary it was rendered from, so the design does not have to be
-reconstructed here - it is read off the trials.
+Each session of the task (`experiment/`) is saved as one JSON container with `session`,
+`demographics`, `design` and `trials`. Every trial carries the full Pyllusion parameter
+dictionary it was rendered from, so the design does not have to be reconstructed here - it is
+read off the trials.
+
+Sessions come from two places: `data/pilots/` (files downloaded from the task's end screen, in
+the repo) and `data/raw/` (sessions saved to Zenodo through DataPipe, fetched by
+`data/download.py`, git-ignored). Test runs (`test_...`) and the partial files of people who
+stopped partway (`....partial.json`, a different format) are left out.
 
 
 ::: {.cell}
 
 ```{.r .cell-code  code-fold="false"}
-path <- "../data/pilots"
+path <- c("../data/pilots", "../data/raw")
 ```
 :::
 
@@ -85,8 +90,9 @@ read_session <- function(file) {
 
 ```{.r .cell-code  code-fold="false"}
 files <- list.files(path, pattern = "\\.json$", full.names = TRUE)
+files <- files[!grepl("\\.partial\\.json$", files) & !startsWith(basename(files), "test_")]
 
-data <- map(files, read_session) |>
+df <- map(files, read_session) |>
   list_rbind() |>
   mutate(
     Participant = participant_id,
@@ -96,15 +102,15 @@ data <- map(files, read_session) |>
     Difference_Side = if_else(Difference > 0, "Left", "Right"),
     # The illusion. The sign of `Illusion_Strength` says which panel holds the
     # red-leaning disc (>= 0 is left), its magnitude the chromatic separation.
-    Illusion_Strength_Abs = abs(Illusion_Strength),
     Red_Side = case_when(
       Illusion_Strength > 0 ~ "Left",
       Illusion_Strength < 0 ~ "Right",
       .default = "None"  # both panels are the same purple
     ),
+    Illusion_Strength = as.factor(Illusion_Strength),
     # Response
     Response = str_remove(response, "Arrow"),
-    Response_Left = Response == "Left",
+    ResponseRight = Response == "Right",
     Error = !correct,
     RT = rt / 1000,
     ISI = isi / 1000,
@@ -128,7 +134,7 @@ Did the files load as expected, and is the task doing what the design says?
 ::: {.cell}
 
 ```{.r .cell-code}
-data |>
+df |>
   summarise(
     Trials = n(),
     Sets = n_distinct(set),
@@ -147,6 +153,7 @@ data |>
 
 |Participant | Trials| Sets| Blocks| Accuracy| RT_median| Duration_min|
 |:-----------|------:|----:|------:|--------:|---------:|------------:|
+|b8t8gbrk    |    200|   10|      4|     0.90|      1.05|        21.03|
 |9bv9m7gt    |    200|   10|      4|     0.98|      0.66|        15.59|
 
 
@@ -161,7 +168,7 @@ appear once per set - i.e. `n_sets` times:
 ::: {.cell}
 
 ```{.r .cell-code}
-data |>
+df |>
   count(Illusion_Strength, Difference_Abs) |>
   pivot_wider(names_from = Difference_Abs, values_from = n, names_sort = TRUE) |>
   display()
@@ -170,13 +177,13 @@ data |>
 ::: {.cell-output-display}
 
 
-|Illusion_Strength | 0.1| 0.25| 0.5| 1 |
-|:-----------------|---:|----:|---:|:--|
-|-1.00             |  10|   10|  10|10 |
-|-0.50             |  10|   10|  10|10 |
-|0.00              |  10|   10|  10|10 |
-|0.50              |  10|   10|  10|10 |
-|1.00              |  10|   10|  10|10 |
+|Illusion_Strength | 0.05| 0.1| 0.25| 0.5| 1 |
+|:-----------------|----:|---:|----:|---:|:--|
+|-1                |   10|  20|   20|  20|10 |
+|-0.5              |   10|  20|   20|  20|10 |
+|0                 |   10|  20|   20|  20|10 |
+|0.5               |   10|  20|   20|  20|10 |
+|1                 |   10|  20|   20|  20|10 |
 
 
 :::
@@ -190,7 +197,7 @@ close to half and half rather than exact:
 ::: {.cell}
 
 ```{.r .cell-code}
-data |>
+df |>
   count(Illusion_Strength, Difference_Side) |>
   pivot_wider(names_from = Difference_Side, values_from = n) |>
   display()
@@ -201,11 +208,11 @@ data |>
 
 |Illusion_Strength | Left| Right|
 |:-----------------|----:|-----:|
-|-1.00             |   20|    20|
-|-0.50             |   20|    20|
-|0.00              |   20|    20|
-|0.50              |   20|    20|
-|1.00              |   20|    20|
+|-1                |   40|    40|
+|-0.5              |   40|    40|
+|0                 |   40|    40|
+|0.5               |   40|    40|
+|1                 |   40|    40|
 
 
 :::
@@ -222,7 +229,7 @@ to equally frequent (exactly so for the two-level ones):
 map(
   c("Size", "Gap", "Density", "Dither_Size", "Equiluminant", "Size_Panel_Mode"),
   \(f) {
-    data |>
+    df |>
       count(.data[[f]]) |>
       rename(Level = 1) |>
       mutate(Factor = f, Level = as.character(Level), .before = 1)
@@ -235,24 +242,24 @@ map(
 ::: {.cell-output-display}
 
 
-|Factor          | Level|   n|
-|:---------------|-----:|---:|
-|Size            |  0.25|  69|
-|Size            |   0.5|  66|
-|Size            |  0.75|  65|
-|Gap             |     0|  65|
-|Gap             |  0.02|  67|
-|Gap             |  0.06|  68|
-|Density         |   0.5|  69|
-|Density         |  0.75|  64|
-|Density         |     1|  67|
-|Dither_Size     |     2|  66|
-|Dither_Size     |     4|  68|
-|Dither_Size     |     8|  66|
-|Equiluminant    | FALSE| 100|
-|Equiluminant    |  TRUE| 100|
-|Size_Panel_Mode |  fill| 100|
-|Size_Panel_Mode | match| 100|
+|Factor          | Level|  n |
+|:---------------|-----:|:---|
+|Size            |  0.25|137 |
+|Size            |   0.5|132 |
+|Size            |  0.75|131 |
+|Gap             |     0|133 |
+|Gap             |  0.02|130 |
+|Gap             |  0.06|137 |
+|Density         |   0.5|133 |
+|Density         |  0.75|132 |
+|Density         |     1|135 |
+|Dither_Size     |     2|134 |
+|Dither_Size     |     4|135 |
+|Dither_Size     |     8|131 |
+|Equiluminant    | FALSE|200 |
+|Equiluminant    |  TRUE|200 |
+|Size_Panel_Mode |  fill|200 |
+|Size_Panel_Mode | match|200 |
 
 
 :::
@@ -280,7 +287,7 @@ after the final response).
 ::: {.cell}
 
 ```{.r .cell-code  code-fold="false"}
-durations <- data |>
+durations <- df |>
   arrange(Participant, order) |>
   mutate(
     trial_end = stimulus_onset + rt,  # ms since page load
@@ -313,6 +320,7 @@ durations |>
 |Participant | Trials|Total | Instructions| Trials_time| Breaks| Sec_per_trial| Residual|
 |:-----------|------:|:-----|------------:|-----------:|------:|-------------:|--------:|
 |9bv9m7gt    |    200|15.59 |         6.49|        7.92|   1.17|          2.38|     0.51|
+|b8t8gbrk    |    200|21.03 |         0.98|        9.31|  10.74|          2.79|     0.35|
 
 
 :::
@@ -338,11 +346,11 @@ durations |>
 
 |Part          | mean |  min |  max |
 |:-------------|:-----|:-----|:-----|
-|Total         |15.59 |15.59 |15.59 |
-|Instructions  | 6.49 | 6.49 | 6.49 |
-|Trials_time   | 7.92 | 7.92 | 7.92 |
-|Breaks        | 1.17 | 1.17 | 1.17 |
-|Sec_per_trial | 2.38 | 2.38 | 2.38 |
+|Total         |18.31 |15.59 |21.03 |
+|Instructions  | 3.73 | 0.98 | 6.49 |
+|Trials_time   | 8.62 | 7.92 | 9.31 |
+|Breaks        | 5.95 | 1.17 |10.74 |
+|Sec_per_trial | 2.59 | 2.38 | 2.79 |
 
 
 :::
@@ -385,7 +393,7 @@ is the self-paced break screen that followed the block.
 ::: {.cell}
 
 ```{.r .cell-code}
-by_trial <- data |>
+by_trial <- df |>
   arrange(Participant, order) |>
   mutate(
     trial_end = stimulus_onset + rt,
@@ -420,14 +428,18 @@ by_trial |>
 |9bv9m7gt    |     2|     50|    1.91|      0.63|  0.00|       50.03|
 |9bv9m7gt    |     3|     50|    1.97|      0.68|  0.04|        4.49|
 |9bv9m7gt    |     4|     50|    1.95|      0.63|  0.00|            |
+|b8t8gbrk    |     1|     50|    2.25|      0.97|  0.12|      339.65|
+|b8t8gbrk    |     2|     50|    2.42|      1.10|  0.10|       21.02|
+|b8t8gbrk    |     3|     50|    2.24|      1.03|  0.10|      283.53|
+|b8t8gbrk    |     4|     50|    2.40|      1.15|  0.08|            |
 
 
 :::
 :::
 
 
-At 2.4 s per trial, a set of 20 trials costs about
-0.8 min of trial time, so `n_sets` can be
+At 2.6 s per trial, a set of 20 trials costs about
+0.9 min of trial time, so `n_sets` can be
 priced directly: the instruction phase is a fixed overhead on top, and the breaks are
 self-paced.
 
@@ -437,14 +449,14 @@ self-paced.
 ::: {.cell}
 
 ```{.r .cell-code}
-p1 <- data |>
+p1 <- df |>
   summarise(Error = mean(Error), .by = c(Difference_Abs, Participant)) |>
   ggplot(aes(x = factor(Difference_Abs), y = Error)) +
   geom_bar(stat = "identity", fill = "#9C27B0") +
   labs(x = "Area difference", y = "Error rate", title = "Difficulty") +
   theme_modern()
 
-p2 <- data |>
+p2 <- df |>
   ggplot(aes(x = RT)) +
   geom_histogram(bins = 40, fill = "#9C27B0") +
   labs(x = "RT (s)", y = NULL, title = "Reaction times") +
@@ -455,6 +467,22 @@ p1 | p2
 
 ::: {.cell-output-display}
 ![](analysis_files/figure-html/unnamed-chunk-13-1.png){width=672}
+:::
+:::
+
+
+
+::: {.cell}
+
+```{.r .cell-code}
+m <- glm(ResponseRight ~ Difference, data = df, family = "binomial")
+
+estimate_relation(m, length = 100) |> 
+  plot()
+```
+
+::: {.cell-output-display}
+![](analysis_files/figure-html/unnamed-chunk-14-1.png){width=672}
 :::
 :::
 
@@ -470,14 +498,30 @@ between the two signs of `illusion_strength`.
 ::: {.cell}
 
 ```{.r .cell-code}
-m <- glm(Error ~ Difference_Abs, data = data, family = "binomial")
+m <- glm(Error ~ Difference_Abs, data = df, family = "binomial")
 
-estimate_relation(m) |> 
+estimate_relation(m, length = 100) |> 
   plot()
 ```
 
 ::: {.cell-output-display}
-![](analysis_files/figure-html/unnamed-chunk-14-1.png){width=672}
+![](analysis_files/figure-html/unnamed-chunk-15-1.png){width=672}
+:::
+:::
+
+
+
+::: {.cell}
+
+```{.r .cell-code}
+m <- lm(RT ~ poly(Difference_Abs, 2) * Illusion_Strength, data = filter(df, Error == FALSE))
+
+estimate_relation(m, length = 100) |> 
+  plot()
+```
+
+::: {.cell-output-display}
+![](analysis_files/figure-html/unnamed-chunk-16-1.png){width=672}
 :::
 :::
 
