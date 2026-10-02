@@ -98,7 +98,7 @@ df <- map(files, read_session) |>
       Illusion_Strength < 0 ~ "Right",
       .default = "None"  # both panels are the same purple
     ),
-    Illusion_Strength = as.factor(Illusion_Strength),
+    # Illusion_Strength = as.factor(Illusion_Strength),
     # Response
     Response = str_remove(response, "Arrow"),
     ResponseRight = Response == "Right",
@@ -117,7 +117,6 @@ df <- map(files, read_session) |>
 
 ## Sanity checks
 
-Did the files load as expected, and is the task doing what the design says?
 
 ```{r}
 df |>
@@ -177,16 +176,7 @@ How long the task actually takes, which is what the session length (`n_sets`) ha
 against. Two clocks are logged and they line up: `start_time` / `end_time` are wall clock
 (ISO, UTC), while `stimulus_onset` is `performance.now()`, i.e. milliseconds since the page
 loaded. Since the page loads at `start_time`, the two can be combined to split the session
-into its parts:
-
-- **Instructions** — page load to the first stimulus: consent, demographics and the
-  instruction screens with their two worked examples.
-- **Trials** — the time actually spent on trials (fixation + stimulus + response + mask).
-- **Breaks** — the between-block screens, which are self-paced.
-
-`Residual` is the check on that arithmetic: instructions + trials + breaks should recover
-the wall-clock total, and does to within a second (the `end_time` timestamp is taken just
-after the final response).
+into its parts.
 
 ```{r}
 #| code-fold: false
@@ -316,25 +306,70 @@ estimate_relation(m, length = 100) |>
 
 ## Models
 
-Error rates are the outcome the illusion is supposed to move: with the red disc on one side
-or the other, a bias in the size judgement makes errors more likely in one direction than
-the other. Plotted against the signed difference, an illusion is a *horizontal shift*
-between the two signs of `illusion_strength`.
 
 ```{r}
 #| warning: false
 
-m <- glm(Error ~ Difference_Abs, data = df, family = "binomial")
+m <- glm(Error ~ poly(Illusion_Strength, 2) * as.factor(Difference_Abs),
+         data = df, family = "binomial")
 
-estimate_relation(m, length = 100) |> 
-  plot()
+estimate_prediction(m) |> 
+  filter(Difference_Abs < 1) |> 
+  mutate(Illusion_Strength = as.numeric(as.character(Illusion_Strength))) |> 
+  ggplot(aes(x=Illusion_Strength, y = Predicted, group = Difference_Abs)) +
+  geom_ribbon(aes(fill = Difference_Abs, ymin = CI_low, ymax= CI_high), alpha = 0.2) +
+  geom_line(aes(color = Difference_Abs)) +
+  scale_color_gradient(low = "red", high = "green") +
+  scale_fill_gradient(low = "red", high = "green")
 ```
 
 ```{r}
 #| warning: false
 
-m <- lm(RT ~ poly(Difference_Abs, 2) * Illusion_Strength, data = filter(df, Error == FALSE))
+m <- lm(RT ~ Illusion_Strength * as.factor(Difference_Abs), 
+        data = filter(df, Error == FALSE))
 
-estimate_relation(m, length = 100) |> 
+estimate_prediction(m) |> 
+  filter(Difference_Abs < 1) |> 
+  mutate(Illusion_Strength = as.numeric(as.character(Illusion_Strength))) |> 
+  ggplot(aes(x=Illusion_Strength, y = Predicted, group = Difference_Abs)) +
+  geom_ribbon(aes(fill = Difference_Abs, ymin = CI_low, ymax= CI_high), alpha = 0.2) +
+  geom_line(aes(color = Difference_Abs)) +
+  scale_color_gradient(low = "red", high = "green") +
+  scale_fill_gradient(low = "red", high = "green")
+  
+```
+
+
+
+
+## Modulation
+
+```{r}
+rez <- data.frame()
+for(var in c("Illusion_Strength" ,"Equiluminant", "Size", "Gap", "Density", "Dither_Size", "Size_Panel")) {
+  if(!var %in% c("Size_Panel", "Illusion_Strength")) {
+    var <- paste0("as.factor(", var, ")")
+  }
+  f <- paste0("Error ~ Difference_Abs * ", var)
+  m <- glm(f, family = "binomial", data = df)
+  rez <- parameters(m) |>
+    as.data.frame() |> 
+    tail(n = 2) |> 
+    mutate(Variable = var) |> 
+    select(Variable, Parameter, Coefficient, p) |> 
+    rbind(rez)
+}
+arrange(rez, p)
+```
+
+
+```{r}
+#| warning: false
+
+m <- glm(Error ~ Difference_Abs,
+         data = df, family = "binomial")
+
+estimate_prediction(m, by = "Difference_Abs") |> 
   plot()
 ```
