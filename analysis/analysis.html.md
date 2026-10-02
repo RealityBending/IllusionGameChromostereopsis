@@ -107,7 +107,7 @@ df <- map(files, read_session) |>
       Illusion_Strength < 0 ~ "Right",
       .default = "None"  # both panels are the same purple
     ),
-    Illusion_Strength = as.factor(Illusion_Strength),
+    # Illusion_Strength = as.factor(Illusion_Strength),
     # Response
     Response = str_remove(response, "Arrow"),
     ResponseRight = Response == "Right",
@@ -128,7 +128,6 @@ df <- map(files, read_session) |>
 
 ## Sanity checks
 
-Did the files load as expected, and is the task doing what the design says?
 
 
 ::: {.cell}
@@ -154,6 +153,9 @@ df |>
 |Participant | Trials| Sets| Blocks| Accuracy| RT_median| Duration_min|
 |:-----------|------:|----:|------:|--------:|---------:|------------:|
 |b8t8gbrk    |    200|   10|      4|     0.90|      1.05|        21.03|
+|hxms54yd    |    250|   10|      4|     0.72|      0.54|         9.96|
+|myhiy2id    |    250|   10|      4|     0.80|      0.60|        20.45|
+|afchqsd5    |    250|   10|      4|     0.75|      0.57|        12.08|
 |9bv9m7gt    |    200|   10|      4|     0.98|      0.66|        15.59|
 
 
@@ -177,13 +179,13 @@ df |>
 ::: {.cell-output-display}
 
 
-|Illusion_Strength | 0.05| 0.1| 0.25| 0.5| 1 |
-|:-----------------|----:|---:|----:|---:|:--|
-|-1                |   10|  20|   20|  20|10 |
-|-0.5              |   10|  20|   20|  20|10 |
-|0                 |   10|  20|   20|  20|10 |
-|0.5               |   10|  20|   20|  20|10 |
-|1                 |   10|  20|   20|  20|10 |
+|Illusion_Strength | 0.025| 0.05| 0.1| 0.25| 0.5| 1 |
+|:-----------------|-----:|----:|---:|----:|---:|:--|
+|-1.00             |    30|   40|  50|   50|  50|10 |
+|-0.50             |    30|   40|  50|   50|  50|10 |
+|0.00              |    30|   40|  50|   50|  50|10 |
+|0.50              |    30|   40|  50|   50|  50|10 |
+|1.00              |    30|   40|  50|   50|  50|10 |
 
 
 :::
@@ -208,11 +210,11 @@ df |>
 
 |Illusion_Strength | Left| Right|
 |:-----------------|----:|-----:|
-|-1                |   40|    40|
-|-0.5              |   40|    40|
-|0                 |   40|    40|
-|0.5               |   40|    40|
-|1                 |   40|    40|
+|-1.00             |  111|   119|
+|-0.50             |  116|   114|
+|0.00              |  115|   115|
+|0.50              |  111|   119|
+|1.00              |  113|   117|
 
 
 :::
@@ -244,22 +246,22 @@ map(
 
 |Factor          | Level|  n |
 |:---------------|-----:|:---|
-|Size            |  0.25|137 |
-|Size            |   0.5|132 |
-|Size            |  0.75|131 |
-|Gap             |     0|133 |
-|Gap             |  0.02|130 |
-|Gap             |  0.06|137 |
-|Density         |   0.5|133 |
-|Density         |  0.75|132 |
-|Density         |     1|135 |
-|Dither_Size     |     2|134 |
-|Dither_Size     |     4|135 |
-|Dither_Size     |     8|131 |
-|Equiluminant    | FALSE|200 |
-|Equiluminant    |  TRUE|200 |
-|Size_Panel_Mode |  fill|200 |
-|Size_Panel_Mode | match|200 |
+|Size            |  0.25|385 |
+|Size            |   0.5|383 |
+|Size            |  0.75|382 |
+|Gap             |     0|380 |
+|Gap             |  0.02|382 |
+|Gap             |  0.06|388 |
+|Density         |   0.5|386 |
+|Density         |  0.75|379 |
+|Density         |     1|385 |
+|Dither_Size     |     2|378 |
+|Dither_Size     |     4|389 |
+|Dither_Size     |     8|383 |
+|Equiluminant    | FALSE|571 |
+|Equiluminant    |  TRUE|579 |
+|Size_Panel_Mode |  fill|576 |
+|Size_Panel_Mode | match|574 |
 
 
 :::
@@ -272,16 +274,7 @@ How long the task actually takes, which is what the session length (`n_sets`) ha
 against. Two clocks are logged and they line up: `start_time` / `end_time` are wall clock
 (ISO, UTC), while `stimulus_onset` is `performance.now()`, i.e. milliseconds since the page
 loaded. Since the page loads at `start_time`, the two can be combined to split the session
-into its parts:
-
-- **Instructions** — page load to the first stimulus: consent, demographics and the
-  instruction screens with their two worked examples.
-- **Trials** — the time actually spent on trials (fixation + stimulus + response + mask).
-- **Breaks** — the between-block screens, which are self-paced.
-
-`Residual` is the check on that arithmetic: instructions + trials + breaks should recover
-the wall-clock total, and does to within a second (the `end_time` timestamp is taken just
-after the final response).
+into its parts.
 
 
 ::: {.cell}
@@ -320,7 +313,10 @@ durations |>
 |Participant | Trials|Total | Instructions| Trials_time| Breaks| Sec_per_trial| Residual|
 |:-----------|------:|:-----|------------:|-----------:|------:|-------------:|--------:|
 |9bv9m7gt    |    200|15.59 |         6.49|        7.92|   1.17|          2.38|     0.51|
+|afchqsd5    |    250|12.08 |         2.45|        9.08|   0.54|          2.18|     0.19|
 |b8t8gbrk    |    200|21.03 |         0.98|        9.31|  10.74|          2.79|     0.35|
+|hxms54yd    |    250| 9.96 |         0.79|        8.81|   0.35|          2.11|     0.67|
+|myhiy2id    |    250|20.45 |         0.99|        9.77|   9.69|          2.34|    -0.10|
 
 
 :::
@@ -344,13 +340,13 @@ durations |>
 ::: {.cell-output-display}
 
 
-|Part          | mean |  min |  max |
-|:-------------|:-----|:-----|:-----|
-|Total         |18.31 |15.59 |21.03 |
-|Instructions  | 3.73 | 0.98 | 6.49 |
-|Trials_time   | 8.62 | 7.92 | 9.31 |
-|Breaks        | 5.95 | 1.17 |10.74 |
-|Sec_per_trial | 2.59 | 2.38 | 2.79 |
+|Part          | mean | min |  max |
+|:-------------|:-----|:----|:-----|
+|Total         |15.82 |9.96 |21.03 |
+|Instructions  | 2.34 |0.79 | 6.49 |
+|Trials_time   | 8.98 |7.92 | 9.77 |
+|Breaks        | 4.50 |0.35 |10.74 |
+|Sec_per_trial | 2.36 |2.11 | 2.79 |
 
 
 :::
@@ -428,18 +424,30 @@ by_trial |>
 |9bv9m7gt    |     2|     50|    1.91|      0.63|  0.00|       50.03|
 |9bv9m7gt    |     3|     50|    1.97|      0.68|  0.04|        4.49|
 |9bv9m7gt    |     4|     50|    1.95|      0.63|  0.00|            |
+|afchqsd5    |     1|     63|    2.29|      0.58|  0.22|        9.11|
+|afchqsd5    |     2|     63|    2.22|      0.51|  0.32|       20.83|
+|afchqsd5    |     3|     63|    2.33|      0.58|  0.22|        2.72|
+|afchqsd5    |     4|     61|    2.24|      0.60|  0.25|            |
 |b8t8gbrk    |     1|     50|    2.25|      0.97|  0.12|      339.65|
 |b8t8gbrk    |     2|     50|    2.42|      1.10|  0.10|       21.02|
 |b8t8gbrk    |     3|     50|    2.24|      1.03|  0.10|      283.53|
 |b8t8gbrk    |     4|     50|    2.40|      1.15|  0.08|            |
+|hxms54yd    |     1|     63|    2.29|      0.58|  0.29|       11.57|
+|hxms54yd    |     2|     63|    2.20|      0.51|  0.27|        5.41|
+|hxms54yd    |     3|     63|    2.20|      0.53|  0.27|        4.26|
+|hxms54yd    |     4|     61|    2.12|      0.54|  0.31|            |
+|myhiy2id    |     1|     63|    2.54|      0.76|  0.22|       16.61|
+|myhiy2id    |     2|     63|    2.76|      0.73|  0.16|      510.38|
+|myhiy2id    |     3|     63|    2.28|      0.54|  0.29|       54.41|
+|myhiy2id    |     4|     61|    2.18|      0.53|  0.13|            |
 
 
 :::
 :::
 
 
-At 2.6 s per trial, a set of 20 trials costs about
-0.9 min of trial time, so `n_sets` can be
+At 2.4 s per trial, a set of 20 trials costs about
+0.8 min of trial time, so `n_sets` can be
 priced directly: the instruction phase is a fixed overhead on top, and the breaks are
 self-paced.
 
@@ -489,19 +497,22 @@ estimate_relation(m, length = 100) |>
 
 ## Models
 
-Error rates are the outcome the illusion is supposed to move: with the red disc on one side
-or the other, a bias in the size judgement makes errors more likely in one direction than
-the other. Plotted against the signed difference, an illusion is a *horizontal shift*
-between the two signs of `illusion_strength`.
 
 
 ::: {.cell}
 
 ```{.r .cell-code}
-m <- glm(Error ~ Difference_Abs, data = df, family = "binomial")
+m <- glm(Error ~ poly(Illusion_Strength, 2) * as.factor(Difference_Abs),
+         data = df, family = "binomial")
 
-estimate_relation(m, length = 100) |> 
-  plot()
+estimate_prediction(m) |> 
+  filter(Difference_Abs < 1) |> 
+  mutate(Illusion_Strength = as.numeric(as.character(Illusion_Strength))) |> 
+  ggplot(aes(x=Illusion_Strength, y = Predicted, group = Difference_Abs)) +
+  geom_ribbon(aes(fill = Difference_Abs, ymin = CI_low, ymax= CI_high), alpha = 0.2) +
+  geom_line(aes(color = Difference_Abs)) +
+  scale_color_gradient(low = "red", high = "green") +
+  scale_fill_gradient(low = "red", high = "green")
 ```
 
 ::: {.cell-output-display}
@@ -514,14 +525,67 @@ estimate_relation(m, length = 100) |>
 ::: {.cell}
 
 ```{.r .cell-code}
-m <- lm(RT ~ poly(Difference_Abs, 2) * Illusion_Strength, data = filter(df, Error == FALSE))
+m <- lm(RT ~ Illusion_Strength * as.factor(Difference_Abs), 
+        data = filter(df, Error == FALSE))
 
-estimate_relation(m, length = 100) |> 
-  plot()
+estimate_prediction(m) |> 
+  filter(Difference_Abs < 1) |> 
+  mutate(Illusion_Strength = as.numeric(as.character(Illusion_Strength))) |> 
+  ggplot(aes(x=Illusion_Strength, y = Predicted, group = Difference_Abs)) +
+  geom_ribbon(aes(fill = Difference_Abs, ymin = CI_low, ymax= CI_high), alpha = 0.2) +
+  geom_line(aes(color = Difference_Abs)) +
+  scale_color_gradient(low = "red", high = "green") +
+  scale_fill_gradient(low = "red", high = "green")
 ```
 
 ::: {.cell-output-display}
 ![](analysis_files/figure-html/unnamed-chunk-16-1.png){width=672}
+:::
+:::
+
+
+
+
+
+## Modulation
+
+
+::: {.cell}
+
+```{.r .cell-code}
+rez <- data.frame()
+for(var in c("Illusion_Strength" ,"Equiluminant", "Size", "Gap", "Density", "Dither_Size", "Size_Panel")) {
+  if(!var %in% c("Size_Panel", "Illusion_Strength")) {
+    var <- paste0("as.factor(", var, ")")
+  }
+  f <- paste0("Error ~ Difference_Abs * ", var)
+  m <- glm(f, family = "binomial", data = df)
+  rez <- parameters(m) |>
+    as.data.frame() |> 
+    tail(n = 2) |> 
+    mutate(Variable = var) |> 
+    select(Variable, Parameter, Coefficient, p) |> 
+    rbind(rez)
+}
+arrange(rez, p)
+```
+:::
+
+
+
+
+::: {.cell}
+
+```{.r .cell-code}
+m <- glm(Error ~ Difference_Abs,
+         data = df, family = "binomial")
+
+estimate_prediction(m, by = "Difference_Abs") |> 
+  plot()
+```
+
+::: {.cell-output-display}
+![](analysis_files/figure-html/unnamed-chunk-18-1.png){width=672}
 :::
 :::
 

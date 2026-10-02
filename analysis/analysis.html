@@ -94,6 +94,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#duration" id="toc-duration" class="nav-link" data-scroll-target="#duration">Duration</a></li>
   <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">Overview</a></li>
   <li><a href="#models" id="toc-models" class="nav-link" data-scroll-target="#models">Models</a></li>
+  <li><a href="#modulation" id="toc-modulation" class="nav-link" data-scroll-target="#modulation">Modulation</a></li>
   </ul>
 </nav>
 </div>
@@ -185,7 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>      Illusion_Strength <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"Right"</span>,</span>
 <span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">.default =</span> <span class="st">"None"</span>  <span class="co"># both panels are the same purple</span></span>
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">Illusion_Strength =</span> <span class="fu">as.factor</span>(Illusion_Strength),</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Illusion_Strength = as.factor(Illusion_Strength),</span></span>
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Response</span></span>
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">Response =</span> <span class="fu">str_remove</span>(response, <span class="st">"Arrow"</span>),</span>
 <span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">ResponseRight =</span> Response <span class="sc">==</span> <span class="st">"Right"</span>,</span>
@@ -204,7 +205,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="sanity-checks" class="level2">
 <h2 class="anchored" data-anchor-id="sanity-checks">Sanity checks</h2>
-<p>Did the files load as expected, and is the task doing what the design says?</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -245,6 +245,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td style="text-align: right;">21.03</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">hxms54yd</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.72</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">9.96</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">myhiy2id</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.80</td>
+<td style="text-align: right;">0.60</td>
+<td style="text-align: right;">20.45</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">afchqsd5</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">0.57</td>
+<td style="text-align: right;">12.08</td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">9bv9m7gt</td>
 <td style="text-align: right;">200</td>
 <td style="text-align: right;">10</td>
@@ -271,6 +298,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 <tr class="header">
 <th style="text-align: left;">Illusion_Strength</th>
+<th style="text-align: right;">0.025</th>
 <th style="text-align: right;">0.05</th>
 <th style="text-align: right;">0.1</th>
 <th style="text-align: right;">0.25</th>
@@ -280,43 +308,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">-1</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">20</td>
+<td style="text-align: left;">-1.00</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
 <td style="text-align: left;">10</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">-0.5</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">20</td>
+<td style="text-align: left;">-0.50</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
 <td style="text-align: left;">10</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">0</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">20</td>
+<td style="text-align: left;">0.00</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
 <td style="text-align: left;">10</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">0.5</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">20</td>
+<td style="text-align: left;">0.50</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
 <td style="text-align: left;">10</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">20</td>
+<td style="text-align: left;">1.00</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
 <td style="text-align: left;">10</td>
 </tr>
 </tbody>
@@ -343,29 +376,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">-1</td>
-<td style="text-align: right;">40</td>
-<td style="text-align: right;">40</td>
+<td style="text-align: left;">-1.00</td>
+<td style="text-align: right;">111</td>
+<td style="text-align: right;">119</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">-0.5</td>
-<td style="text-align: right;">40</td>
-<td style="text-align: right;">40</td>
+<td style="text-align: left;">-0.50</td>
+<td style="text-align: right;">116</td>
+<td style="text-align: right;">114</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">0</td>
-<td style="text-align: right;">40</td>
-<td style="text-align: right;">40</td>
+<td style="text-align: left;">0.00</td>
+<td style="text-align: right;">115</td>
+<td style="text-align: right;">115</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">0.5</td>
-<td style="text-align: right;">40</td>
-<td style="text-align: right;">40</td>
+<td style="text-align: left;">0.50</td>
+<td style="text-align: right;">111</td>
+<td style="text-align: right;">119</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1</td>
-<td style="text-align: right;">40</td>
-<td style="text-align: right;">40</td>
+<td style="text-align: left;">1.00</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">117</td>
 </tr>
 </tbody>
 </table>
@@ -400,82 +433,82 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td style="text-align: left;">Size</td>
 <td style="text-align: right;">0.25</td>
-<td style="text-align: left;">137</td>
+<td style="text-align: left;">385</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Size</td>
 <td style="text-align: right;">0.5</td>
-<td style="text-align: left;">132</td>
+<td style="text-align: left;">383</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Size</td>
 <td style="text-align: right;">0.75</td>
-<td style="text-align: left;">131</td>
+<td style="text-align: left;">382</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Gap</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: left;">133</td>
+<td style="text-align: left;">380</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Gap</td>
 <td style="text-align: right;">0.02</td>
-<td style="text-align: left;">130</td>
+<td style="text-align: left;">382</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Gap</td>
 <td style="text-align: right;">0.06</td>
-<td style="text-align: left;">137</td>
+<td style="text-align: left;">388</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Density</td>
 <td style="text-align: right;">0.5</td>
-<td style="text-align: left;">133</td>
+<td style="text-align: left;">386</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Density</td>
 <td style="text-align: right;">0.75</td>
-<td style="text-align: left;">132</td>
+<td style="text-align: left;">379</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Density</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: left;">135</td>
+<td style="text-align: left;">385</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Dither_Size</td>
 <td style="text-align: right;">2</td>
-<td style="text-align: left;">134</td>
+<td style="text-align: left;">378</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Dither_Size</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: left;">135</td>
+<td style="text-align: left;">389</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Dither_Size</td>
 <td style="text-align: right;">8</td>
-<td style="text-align: left;">131</td>
+<td style="text-align: left;">383</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Equiluminant</td>
 <td style="text-align: right;">FALSE</td>
-<td style="text-align: left;">200</td>
+<td style="text-align: left;">571</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Equiluminant</td>
 <td style="text-align: right;">TRUE</td>
-<td style="text-align: left;">200</td>
+<td style="text-align: left;">579</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Size_Panel_Mode</td>
 <td style="text-align: right;">fill</td>
-<td style="text-align: left;">200</td>
+<td style="text-align: left;">576</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Size_Panel_Mode</td>
 <td style="text-align: right;">match</td>
-<td style="text-align: left;">200</td>
+<td style="text-align: left;">574</td>
 </tr>
 </tbody>
 </table>
@@ -484,13 +517,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="duration" class="level2">
 <h2 class="anchored" data-anchor-id="duration">Duration</h2>
-<p>How long the task actually takes, which is what the session length (<code>n_sets</code>) has to be set against. Two clocks are logged and they line up: <code>start_time</code> / <code>end_time</code> are wall clock (ISO, UTC), while <code>stimulus_onset</code> is <code>performance.now()</code>, i.e.&nbsp;milliseconds since the page loaded. Since the page loads at <code>start_time</code>, the two can be combined to split the session into its parts:</p>
-<ul>
-<li><strong>Instructions</strong> — page load to the first stimulus: consent, demographics and the instruction screens with their two worked examples.</li>
-<li><strong>Trials</strong> — the time actually spent on trials (fixation + stimulus + response + mask).</li>
-<li><strong>Breaks</strong> — the between-block screens, which are self-paced.</li>
-</ul>
-<p><code>Residual</code> is the check on that arithmetic: instructions + trials + breaks should recover the wall-clock total, and does to within a second (the <code>end_time</code> timestamp is taken just after the final response).</p>
+<p>How long the task actually takes, which is what the session length (<code>n_sets</code>) has to be set against. Two clocks are logged and they line up: <code>start_time</code> / <code>end_time</code> are wall clock (ISO, UTC), while <code>stimulus_onset</code> is <code>performance.now()</code>, i.e.&nbsp;milliseconds since the page loaded. Since the page loads at <code>start_time</code>, the two can be combined to split the session into its parts.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>durations <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Participant, order) <span class="sc">|&gt;</span></span>
@@ -553,6 +580,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td style="text-align: right;">0.51</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">afchqsd5</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: left;">12.08</td>
+<td style="text-align: right;">2.45</td>
+<td style="text-align: right;">9.08</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">2.18</td>
+<td style="text-align: right;">0.19</td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">b8t8gbrk</td>
 <td style="text-align: right;">200</td>
 <td style="text-align: left;">21.03</td>
@@ -561,6 +598,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td style="text-align: right;">10.74</td>
 <td style="text-align: right;">2.79</td>
 <td style="text-align: right;">0.35</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">hxms54yd</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: left;">9.96</td>
+<td style="text-align: right;">0.79</td>
+<td style="text-align: right;">8.81</td>
+<td style="text-align: right;">0.35</td>
+<td style="text-align: right;">2.11</td>
+<td style="text-align: right;">0.67</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">myhiy2id</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: left;">20.45</td>
+<td style="text-align: right;">0.99</td>
+<td style="text-align: right;">9.77</td>
+<td style="text-align: right;">9.69</td>
+<td style="text-align: right;">2.34</td>
+<td style="text-align: right;">-0.10</td>
 </tr>
 </tbody>
 </table>
@@ -591,32 +648,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Total</td>
-<td style="text-align: left;">18.31</td>
-<td style="text-align: left;">15.59</td>
+<td style="text-align: left;">15.82</td>
+<td style="text-align: left;">9.96</td>
 <td style="text-align: left;">21.03</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Instructions</td>
-<td style="text-align: left;">3.73</td>
-<td style="text-align: left;">0.98</td>
+<td style="text-align: left;">2.34</td>
+<td style="text-align: left;">0.79</td>
 <td style="text-align: left;">6.49</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Trials_time</td>
-<td style="text-align: left;">8.62</td>
+<td style="text-align: left;">8.98</td>
 <td style="text-align: left;">7.92</td>
-<td style="text-align: left;">9.31</td>
+<td style="text-align: left;">9.77</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Breaks</td>
-<td style="text-align: left;">5.95</td>
-<td style="text-align: left;">1.17</td>
+<td style="text-align: left;">4.50</td>
+<td style="text-align: left;">0.35</td>
 <td style="text-align: left;">10.74</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Sec_per_trial</td>
-<td style="text-align: left;">2.59</td>
-<td style="text-align: left;">2.38</td>
+<td style="text-align: left;">2.36</td>
+<td style="text-align: left;">2.11</td>
 <td style="text-align: left;">2.79</td>
 </tr>
 </tbody>
@@ -731,6 +788,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td style="text-align: right;"></td>
 </tr>
 <tr class="odd">
+<td style="text-align: left;">afchqsd5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.29</td>
+<td style="text-align: right;">0.58</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">9.11</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">afchqsd5</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.22</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">0.32</td>
+<td style="text-align: right;">20.83</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">afchqsd5</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.33</td>
+<td style="text-align: right;">0.58</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">2.72</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">afchqsd5</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">2.24</td>
+<td style="text-align: right;">0.60</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">b8t8gbrk</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">50</td>
@@ -766,11 +859,83 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td style="text-align: right;">0.08</td>
 <td style="text-align: right;"></td>
 </tr>
+<tr class="odd">
+<td style="text-align: left;">hxms54yd</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.29</td>
+<td style="text-align: right;">0.58</td>
+<td style="text-align: right;">0.29</td>
+<td style="text-align: right;">11.57</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">hxms54yd</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.20</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: right;">5.41</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">hxms54yd</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.20</td>
+<td style="text-align: right;">0.53</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: right;">4.26</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">hxms54yd</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">2.12</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">myhiy2id</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.54</td>
+<td style="text-align: right;">0.76</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">16.61</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">myhiy2id</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.76</td>
+<td style="text-align: right;">0.73</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">510.38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">myhiy2id</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.28</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">0.29</td>
+<td style="text-align: right;">54.41</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">myhiy2id</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">2.18</td>
+<td style="text-align: right;">0.53</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;"></td>
+</tr>
 </tbody>
 </table>
 </div>
 </div>
-<p>At 2.6 s per trial, a set of 20 trials costs about 0.9 min of trial time, so <code>n_sets</code> can be priced directly: the instruction phase is a fixed overhead on top, and the breaks are self-paced.</p>
+<p>At 2.4 s per trial, a set of 20 trials costs about 0.8 min of trial time, so <code>n_sets</code> can be priced directly: the instruction phase is a fixed overhead on top, and the breaks are self-paced.</p>
 </section>
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
@@ -819,14 +984,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="models" class="level2">
 <h2 class="anchored" data-anchor-id="models">Models</h2>
-<p>Error rates are the outcome the illusion is supposed to move: with the red disc on one side or the other, a bias in the size judgement makes errors more likely in one direction than the other. Plotted against the signed difference, an illusion is a <em>horizontal shift</em> between the two signs of <code>illusion_strength</code>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">glm</span>(Error <span class="sc">~</span> Difference_Abs, <span class="at">data =</span> df, <span class="at">family =</span> <span class="st">"binomial"</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">estimate_relation</span>(m, <span class="at">length =</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">glm</span>(Error <span class="sc">~</span> <span class="fu">poly</span>(Illusion_Strength, <span class="dv">2</span>) <span class="sc">*</span> <span class="fu">as.factor</span>(Difference_Abs),</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">data =</span> df, <span class="at">family =</span> <span class="st">"binomial"</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">estimate_prediction</span>(m) <span class="sc">|&gt;</span> </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Difference_Abs <span class="sc">&lt;</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Illusion_Strength =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(Illusion_Strength))) <span class="sc">|&gt;</span> </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Illusion_Strength, <span class="at">y =</span> Predicted, <span class="at">group =</span> Difference_Abs)) <span class="sc">+</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">fill =</span> Difference_Abs, <span class="at">ymin =</span> CI_low, <span class="at">ymax=</span> CI_high), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">color =</span> Difference_Abs)) <span class="sc">+</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">"red"</span>, <span class="at">high =</span> <span class="st">"green"</span>) <span class="sc">+</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"red"</span>, <span class="at">high =</span> <span class="st">"green"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -839,15 +1010,62 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">lm</span>(RT <span class="sc">~</span> <span class="fu">poly</span>(Difference_Abs, <span class="dv">2</span>) <span class="sc">*</span> Illusion_Strength, <span class="at">data =</span> <span class="fu">filter</span>(df, Error <span class="sc">==</span> <span class="cn">FALSE</span>))</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">estimate_relation</span>(m, <span class="at">length =</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">lm</span>(RT <span class="sc">~</span> Illusion_Strength <span class="sc">*</span> <span class="fu">as.factor</span>(Difference_Abs), </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">filter</span>(df, Error <span class="sc">==</span> <span class="cn">FALSE</span>))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">estimate_prediction</span>(m) <span class="sc">|&gt;</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Difference_Abs <span class="sc">&lt;</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Illusion_Strength =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(Illusion_Strength))) <span class="sc">|&gt;</span> </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Illusion_Strength, <span class="at">y =</span> Predicted, <span class="at">group =</span> Difference_Abs)) <span class="sc">+</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">fill =</span> Difference_Abs, <span class="at">ymin =</span> CI_low, <span class="at">ymax=</span> CI_high), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">color =</span> Difference_Abs)) <span class="sc">+</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">"red"</span>, <span class="at">high =</span> <span class="st">"green"</span>) <span class="sc">+</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"red"</span>, <span class="at">high =</span> <span class="st">"green"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="analysis_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="modulation" class="level2">
+<h2 class="anchored" data-anchor-id="modulation">Modulation</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>rez <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(var <span class="cf">in</span> <span class="fu">c</span>(<span class="st">"Illusion_Strength"</span> ,<span class="st">"Equiluminant"</span>, <span class="st">"Size"</span>, <span class="st">"Gap"</span>, <span class="st">"Density"</span>, <span class="st">"Dither_Size"</span>, <span class="st">"Size_Panel"</span>)) {</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span>var <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Size_Panel"</span>, <span class="st">"Illusion_Strength"</span>)) {</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    var <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"as.factor("</span>, var, <span class="st">")"</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  f <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Error ~ Difference_Abs * "</span>, var)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="fu">glm</span>(f, <span class="at">family =</span> <span class="st">"binomial"</span>, <span class="at">data =</span> df)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  rez <span class="ot">&lt;-</span> <span class="fu">parameters</span>(m) <span class="sc">|&gt;</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tail</span>(<span class="at">n =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Variable =</span> var) <span class="sc">|&gt;</span> </span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Variable, Parameter, Coefficient, p) <span class="sc">|&gt;</span> </span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rbind</span>(rez)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="fu">arrange</span>(rez, p)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">glm</span>(Error <span class="sc">~</span> Difference_Abs,</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">data =</span> df, <span class="at">family =</span> <span class="st">"binomial"</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">estimate_prediction</span>(m, <span class="at">by =</span> <span class="st">"Difference_Abs"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="analysis_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>

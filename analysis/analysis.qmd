@@ -346,6 +346,8 @@ estimate_prediction(m) |>
 ## Modulation
 
 ```{r}
+#| eval: false
+
 rez <- data.frame()
 for(var in c("Illusion_Strength" ,"Equiluminant", "Size", "Gap", "Density", "Dither_Size", "Size_Panel")) {
   if(!var %in% c("Size_Panel", "Illusion_Strength")) {
