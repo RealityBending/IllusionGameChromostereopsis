@@ -82,11 +82,12 @@ read_session <- function(file) {
 
 files <- list.files(path, pattern = "\\.json$", full.names = TRUE)
 files <- files[!grepl("\\.partial\\.json$", files) & !startsWith(basename(files), "test_")]
+files <- files[!duplicated(basename(files))]
 
 df <- map(files, read_session) |>
   list_rbind() |>
   mutate(
-    Participant = participant_id,
+    Participant = paste0("P", str_pad(match(participant_id, unique(participant_id)), 2, pad = "0")),
     # The judged attribute. `Difference` is the signed area difference, positive = left
     # disc is larger; its magnitude is task difficulty and its sign the correct answer.
     Difference_Abs = abs(Difference),
