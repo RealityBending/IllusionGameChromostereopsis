@@ -56,6 +56,7 @@ __pycache__/
 analysis/*.html
 analysis/*.md
 analysis/analysis_files/
+analysis/plots/unnamed-chunk-11-1.png
 
 # macOS folder metadata
 .DS_Store
