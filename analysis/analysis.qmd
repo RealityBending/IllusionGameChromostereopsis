@@ -281,7 +281,7 @@ self-paced.
 #| warning: false
 
 p1 <- df |>
-  summarise(Error = mean(Error), .by = c(Difference_Abs, Participant)) |>
+  summarise(Error = mean(Error), .by = c(Difference_Abs)) |>
   ggplot(aes(x = factor(Difference_Abs), y = Error)) +
   geom_bar(stat = "identity", fill = "#9C27B0") +
   labs(x = "Area difference", y = "Error rate", title = "Difficulty") +

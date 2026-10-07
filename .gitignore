@@ -52,7 +52,10 @@ rsconnect/
 data/raw/
 __pycache__/
 
-# Analysis output: contains participant-level tables and plots
+# Analysis output: contains participant-level data
 analysis/*.html
 analysis/*.md
-analysis/*_files/
+analysis/analysis_files/
+
+# macOS folder metadata
+.DS_Store
