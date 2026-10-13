@@ -113,8 +113,20 @@ df <- map(files, read_session) |>
     # Recorded but uncontrolled moderators
     age = as.numeric(age)
   )
-```
 
+# Exclude sessions run on an earlier design
+current_levels <- c(0.025, 0.05, 0.1, 0.25, 0.5)
+
+design_check <- df |>
+  summarise(
+    Trials = n(),
+    Levels = paste(sort(unique(round(Difference_Abs, 3))), collapse = ", "),
+    .by = Participant
+  ) |>
+  mutate(Current = Levels == paste(current_levels, collapse = ", "))
+
+df <- filter(df, Participant %in% design_check$Participant[design_check$Current])
+```
 
 ## Sanity checks
 
