@@ -23,6 +23,8 @@ library(jsonlite)
 library(tidyverse)
 library(easystats)
 library(patchwork)
+library(lme4)
+library(brms)
 ```
 
 ## Data
@@ -387,4 +389,180 @@ m <- glm(Error ~ Difference_Abs,
 
 estimate_prediction(m, by = "Difference_Abs") |> 
   plot()
+```
+
+
+
+## Summary stats
+
+#### Sample size
+
+```{r}
+df |>
+  summarise(Participants = n_distinct(Participant),
+            Trials = n(),
+            Trials_per_person = n() / n_distinct(Participant)) |>
+  display()
+```
+
+#### Accuracy 
+
+Accuracy when the red disc is the truly larger or smaller one, against the baseline (both panels purple, no red/blue contrast):
+
+```{r}
+df |>
+  mutate(
+    Red_Is = case_when(
+      Red_Side == "None"          ~ "Purple (no red/blue contrast)",
+      Red_Side == Difference_Side ~ "Red larger",
+      .default                    = "Red smaller"
+    )
+  ) |>
+  summarise(Trials = n(), Correct = mean(correct), .by = Red_Is) |>
+  display()
+```
+
+Accuracy per participant (positive `Diff` means more accurate when red is smaller):
+
+```{r}
+df |>
+  filter(Red_Side != "None") |>
+  mutate(Red_Is = if_else(Red_Side == Difference_Side, "Larger", "Smaller")) |>
+  summarise(Correct = mean(correct), .by = c(Participant, Red_Is)) |>
+  pivot_wider(names_from = Red_Is, values_from = Correct, names_prefix = "Red_") |>
+  mutate(Diff = Red_Smaller - Red_Larger) |>
+  display()
+```
+
+## Mixed-effects models
+
+Logistic mixed models of the response (`ResponseRight`). A positive `Illusion_Strength` coefficient means the red disc is judged smaller. Random slopes model between-participant variation in sensitivity to area difference and illusion strength.
+
+### Preparation
+
+```{r}
+df <- df |>
+  mutate(
+    Difference_10pct = Difference / 0.1,             # area difference, in units of 10%
+    Illusion_Strength_f = factor(Illusion_Strength)  # categorical version
+  )
+
+ctrl <- glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5))
+```
+
+### Core model
+
+Singular-fit check: `FALSE` is fine. If `TRUE`, refit with uncorrelated random effects.
+
+```{r}
+m_core <- glmer(
+  ResponseRight ~ Difference_10pct + Illusion_Strength +
+    (1 + Difference_10pct + Illusion_Strength | Participant),
+  data = df, family = binomial, control = ctrl
+)
+
+isSingular(m_core)
+parameters(m_core)
+```
+
+Wald p-values are optimistic with few participants. The likelihood-ratio test and bootstrap below are more reliable checks.
+
+Likelihood-ratio test of `Illusion_Strength`: compares the model with and without it. A small `Pr(>Chisq)` indicates a better fit than expected by chance when it is included.
+
+```{r}
+m_null <- update(m_core, . ~ . - Illusion_Strength)
+anova(m_null, m_core)
+```
+
+Bootstrap 95% confidence intervals for the fixed effects (500 simulations).
+
+```{r}
+set.seed(123)
+confint(m_core, method = "boot", nsim = 500, parm = "beta_")
+```
+
+### Individual differences
+
+Each point shows one participant’s estimated illusion effect from the mixed model (log-odds per unit of illusion strength). Positive values suggest a bias towards judging the red disc as smaller than the blue disc. Negative values suggest a bias in the opposite direction.
+
+```{r}
+ind <- coef(m_core)$Participant |>
+  rownames_to_column("Participant") |>
+  transmute(Participant, Slope = Illusion_Strength)
+
+ind |>
+  ggplot(aes(x = reorder(Participant, Slope), y = Slope)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_point(size = 3, color = "#9C27B0") +
+  coord_flip() +
+  labs(x = NULL, y = "Illusion effect (log-odds per unit of illusion strength)") +
+  theme_modern()
+
+```
+
+### Linear vs categorical illusion strength
+
+Tests whether treating illusion strength as categorical improves on a linear term (likelihood-ratio test; lower AIC/BIC indicates a better fit after penalising complexity). If it doesn’t, the linear term is adequate.
+
+```{r}
+m_cat <- update(m_core, . ~ . - Illusion_Strength + Illusion_Strength_f)
+anova(m_core, m_cat)
+```
+
+### Moderators
+
+Each factor is included as a main effect plus its interaction with `Illusion_Strength`. The likelihood-ratio test compares this against the model without the interaction. p-values are corrected across the 6 factors using Holm, Bonferroni and Benjamini-Hochberg methods.
+
+```{r}
+factors <- c("Size_f", "Gap_f", "Density_f", "Dither_Size_f",
+             "Equiluminant", "Size_Panel_Mode")
+
+moderators <- map(factors, \(f) {
+  m0 <- update(m_core, as.formula(paste(". ~ . +", f)))
+  m1 <- update(m_core, as.formula(paste(". ~ . +", f, "+ Illusion_Strength:", f)))
+  a <- anova(m0, m1)
+  tibble(Factor = f, Chisq = a$Chisq[2], df = a$Df[2], p = a$`Pr(>Chisq)`[2])
+}) |>
+  list_rbind() |>
+  mutate(
+    p_holm = p.adjust(p, method = "holm"),
+    p_bonferroni = p.adjust(p, method = "bonferroni"),
+    p_bh = p.adjust(p, method = "BH")
+  )
+
+display(moderators)
+```
+
+
+### Illusion effect by factor level
+
+The marginal effect of `Illusion_Strength` at each level of each factor, i.e. the change in the probability of a right-hand response per unit of illusion strength. Descriptive only - moderator tests above show whether levels differ.
+
+```{r}
+for (f in factors) {
+  m1 <- update(m_core, as.formula(paste(". ~ . +", f, "+ Illusion_Strength:", f)))
+  print(estimate_slopes(m1, trend = "Illusion_Strength", by = f))
+}
+```
+
+### Bayesian core model
+
+Bayesian version of the core model, with weakly informative priors (wide normal on effects, exponential on random-effect SDs). Used as a cross-check on the mixed model above.
+
+```{r}
+#| output: false
+
+m_bayes <- brm(
+  ResponseRight ~ Difference_10pct + Illusion_Strength +
+    (1 + Difference_10pct + Illusion_Strength | Participant),
+  data = df, family = bernoulli(),
+  prior = c(prior(normal(0, 2), class = b),
+            prior(exponential(1), class = sd)),
+  chains = 4, cores = 4, seed = 123,
+  refresh = 0, silent = 2
+)
+```
+
+```{r}
+describe_posterior(m_bayes, test = "pd")
 ```
