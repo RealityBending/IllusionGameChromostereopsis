@@ -1,0 +1,2614 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Chromostereopsis Pilot - Analysis</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="analysis_files/libs/clipboard/clipboard.min.js"></script>
+<script src="analysis_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="analysis_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="analysis_files/libs/quarto-html/popper.min.js"></script>
+<script src="analysis_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="analysis_files/libs/quarto-html/anchor.min.js"></script>
+<link href="analysis_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="analysis_files/libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="analysis_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="analysis_files/libs/bootstrap/bootstrap-917079515d91bccb85b543faf8aa8bb6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#packages" id="toc-packages" class="nav-link active" data-scroll-target="#packages">Packages</a></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">Data</a>
+  <ul class="collapse">
+  <li><a href="#reading-one-session" id="toc-reading-one-session" class="nav-link" data-scroll-target="#reading-one-session">Reading one session</a></li>
+  <li><a href="#all-sessions" id="toc-all-sessions" class="nav-link" data-scroll-target="#all-sessions">All sessions</a></li>
+  </ul></li>
+  <li><a href="#sanity-checks" id="toc-sanity-checks" class="nav-link" data-scroll-target="#sanity-checks">Sanity checks</a></li>
+  <li><a href="#duration" id="toc-duration" class="nav-link" data-scroll-target="#duration">Duration</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#models" id="toc-models" class="nav-link" data-scroll-target="#models">Models</a></li>
+  <li><a href="#modulation" id="toc-modulation" class="nav-link" data-scroll-target="#modulation">Modulation</a></li>
+  <li><a href="#summary-stats" id="toc-summary-stats" class="nav-link" data-scroll-target="#summary-stats">Summary stats</a></li>
+  <li><a href="#mixed-effects-models" id="toc-mixed-effects-models" class="nav-link" data-scroll-target="#mixed-effects-models">Mixed-effects models</a>
+  <ul class="collapse">
+  <li><a href="#preparation" id="toc-preparation" class="nav-link" data-scroll-target="#preparation">Preparation</a></li>
+  <li><a href="#core-model" id="toc-core-model" class="nav-link" data-scroll-target="#core-model">Core model</a></li>
+  <li><a href="#individual-differences" id="toc-individual-differences" class="nav-link" data-scroll-target="#individual-differences">Individual differences</a></li>
+  <li><a href="#linear-vs-categorical-illusion-strength" id="toc-linear-vs-categorical-illusion-strength" class="nav-link" data-scroll-target="#linear-vs-categorical-illusion-strength">Linear vs categorical illusion strength</a></li>
+  <li><a href="#moderators" id="toc-moderators" class="nav-link" data-scroll-target="#moderators">Moderators</a></li>
+  <li><a href="#illusion-effect-by-factor-level" id="toc-illusion-effect-by-factor-level" class="nav-link" data-scroll-target="#illusion-effect-by-factor-level">Illusion effect by factor level</a></li>
+  <li><a href="#bayesian-core-model" id="toc-bayesian-core-model" class="nav-link" data-scroll-target="#bayesian-core-model">Bayesian core model</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Chromostereopsis Pilot - Analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="packages" class="level2">
+<h2 class="anchored" data-anchor-id="packages">Packages</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(easystats)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brms)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="data" class="level2">
+<h2 class="anchored" data-anchor-id="data">Data</h2>
+<p>Each session of the task (<code>experiment/</code>) is saved as one JSON container with <code>session</code>, <code>demographics</code>, <code>design</code> and <code>trials</code>. Every trial carries the full Pyllusion parameter dictionary it was rendered from, so the design does not have to be reconstructed here - it is read off the trials.</p>
+<p>Sessions come from two places: <code>data/pilots/</code> (files downloaded from the task’s end screen, in the repo) and <code>data/raw/</code> (sessions saved to Zenodo through DataPipe, fetched by <code>data/download.py</code>, git-ignored). Test runs (<code>test_...</code>) and the partial files of people who stopped partway (<code>....partial.json</code>, a different format) are left out.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>path <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"../data/pilots"</span>, <span class="st">"../data/raw"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="reading-one-session" class="level3">
+<h3 class="anchored" data-anchor-id="reading-one-session">Reading one session</h3>
+<p>The only awkward entries are the colours, which are RGB triplets rather than scalars; they are collapsed to <code>"r,g,b"</code> strings, as the task’s own CSV export does. <code>null</code> (the <code>size_panel</code> “fill” level, and the tap coordinates of keyboard responses) becomes <code>NA</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># One JSON entry -&gt; one value fit for a dataframe column</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>as_column <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(x) <span class="sc">||</span> <span class="fu">length</span>(x) <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(<span class="cn">NA</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(x) <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="fu">return</span>(<span class="fu">paste</span>(<span class="fu">unlist</span>(x), <span class="at">collapse =</span> <span class="st">","</span>))  <span class="co"># RGB triplets</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  x[[<span class="dv">1</span>]]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>read_session <span class="ot">&lt;-</span> <span class="cf">function</span>(file) {</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">fromJSON</span>(file, <span class="at">simplifyVector =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># One row per trial: the trial-level fields, then the parameter dictionary</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  trials <span class="ot">&lt;-</span> <span class="fu">map</span>(d<span class="sc">$</span>trials, <span class="cf">function</span>(trial) {</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    fields <span class="ot">&lt;-</span> trial[<span class="fu">setdiff</span>(<span class="fu">names</span>(trial), <span class="st">"parameters"</span>)]</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>(<span class="fu">map</span>(<span class="fu">c</span>(fields, trial<span class="sc">$</span>parameters), as_column))</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  }) <span class="sc">|&gt;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list_rbind</span>()</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Session and demographics are constant within a file, so repeat them on every row</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  meta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">map</span>(d<span class="sc">$</span>session, as_column), <span class="fu">map</span>(d<span class="sc">$</span>demographics, as_column))</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  trials <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="sc">!!!</span>meta, <span class="at">.before =</span> <span class="dv">1</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="all-sessions" class="level3">
+<h3 class="anchored" data-anchor-id="all-sessions">All sessions</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(path, <span class="at">pattern =</span> <span class="st">"</span><span class="sc">\\</span><span class="st">.json$"</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> files[<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">.partial</span><span class="sc">\\</span><span class="st">.json$"</span>, files) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">startsWith</span>(<span class="fu">basename</span>(files), <span class="st">"test_"</span>)]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> files[<span class="sc">!</span><span class="fu">duplicated</span>(<span class="fu">basename</span>(files))]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">map</span>(files, read_session) <span class="sc">|&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Participant =</span> <span class="fu">paste0</span>(<span class="st">"P"</span>, <span class="fu">str_pad</span>(<span class="fu">match</span>(participant_id, <span class="fu">unique</span>(participant_id)), <span class="dv">2</span>, <span class="at">pad =</span> <span class="st">"0"</span>)),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      <span class="co"># The judged attribute. `Difference` is the signed area difference, positive = left</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>      <span class="co"># disc is larger; its magnitude is task difficulty and its sign the correct answer.</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Difference_Abs =</span> <span class="fu">abs</span>(Difference),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Difference_Side =</span> <span class="fu">if_else</span>(Difference <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="st">"Left"</span>, <span class="st">"Right"</span>),</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The illusion. The sign of `Illusion_Strength` says which panel holds the</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># red-leaning disc (&gt;= 0 is left), its magnitude the chromatic separation.</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">Red_Side =</span> <span class="fu">case_when</span>(</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>      Illusion_Strength <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"Left"</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>      Illusion_Strength <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"Right"</span>,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">.default =</span> <span class="st">"None"</span>  <span class="co"># both panels are the same purple</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Illusion_Strength = as.factor(Illusion_Strength),</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Response</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">Response =</span> <span class="fu">str_remove</span>(response, <span class="st">"Arrow"</span>),</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">ResponseRight =</span> Response <span class="sc">==</span> <span class="st">"Right"</span>,</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">Error =</span> <span class="sc">!</span>correct,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">RT =</span> rt <span class="sc">/</span> <span class="dv">1000</span>,</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">ISI =</span> isi <span class="sc">/</span> <span class="dv">1000</span>,</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Screened stimulus factors, as factors</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">c</span>(Size, Gap, Density, Dither_Size), \(x) <span class="fu">factor</span>(x), <span class="at">.names =</span> <span class="st">"{.col}_f"</span>),</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">Equiluminant =</span> <span class="fu">as.logical</span>(Equiluminant),</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">Size_Panel_Mode =</span> <span class="fu">factor</span>(Size_Panel_Mode, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"fill"</span>, <span class="st">"match"</span>)),</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Recorded but uncontrolled moderators</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">as.numeric</span>(age)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Exclude sessions run on an earlier design</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>current_levels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.05</span>, <span class="fl">0.1</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>design_check <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">Trials =</span> <span class="fu">n</span>(),</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">Levels =</span> <span class="fu">paste</span>(<span class="fu">sort</span>(<span class="fu">unique</span>(<span class="fu">round</span>(Difference_Abs, <span class="dv">3</span>))), <span class="at">collapse =</span> <span class="st">", "</span>),</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Participant</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Current =</span> Levels <span class="sc">==</span> <span class="fu">paste</span>(current_levels, <span class="at">collapse =</span> <span class="st">", "</span>))</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">filter</span>(df, Participant <span class="sc">%in%</span> design_check<span class="sc">$</span>Participant[design_check<span class="sc">$</span>Current])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="sanity-checks" class="level2">
+<h2 class="anchored" data-anchor-id="sanity-checks">Sanity checks</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Trials =</span> <span class="fu">n</span>(),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sets =</span> <span class="fu">n_distinct</span>(set),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Blocks =</span> <span class="fu">n_distinct</span>(block),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Accuracy =</span> <span class="fu">mean</span>(correct),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">RT_median =</span> <span class="fu">median</span>(RT),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ISO 8601 with a "Z": as.POSIXct() silently keeps only the date, ymd_hms() does not</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Duration_min =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(<span class="fu">ymd_hms</span>(end_time[<span class="dv">1</span>]), <span class="fu">ymd_hms</span>(start_time[<span class="dv">1</span>]), <span class="at">units =</span> <span class="st">"mins"</span>)),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Participant</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Participant</th>
+<th style="text-align: right;">Trials</th>
+<th style="text-align: right;">Sets</th>
+<th style="text-align: right;">Blocks</th>
+<th style="text-align: right;">Accuracy</th>
+<th style="text-align: right;">RT_median</th>
+<th style="text-align: right;">Duration_min</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">P02</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.72</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">9.96</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P03</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.80</td>
+<td style="text-align: right;">0.60</td>
+<td style="text-align: right;">20.45</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P04</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">0.57</td>
+<td style="text-align: right;">12.08</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P06</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.69</td>
+<td style="text-align: right;">0.56</td>
+<td style="text-align: right;">12.44</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P07</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.90</td>
+<td style="text-align: right;">2.65</td>
+<td style="text-align: right;">26.02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P08</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.78</td>
+<td style="text-align: right;">1.46</td>
+<td style="text-align: right;">14.70</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P09</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.79</td>
+<td style="text-align: right;">0.90</td>
+<td style="text-align: right;">14.23</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P10</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.72</td>
+<td style="text-align: right;">0.94</td>
+<td style="text-align: right;">14.82</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P11</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.84</td>
+<td style="text-align: right;">0.83</td>
+<td style="text-align: right;">16.45</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P12</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.74</td>
+<td style="text-align: right;">1.44</td>
+<td style="text-align: right;">15.79</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P13</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">0.82</td>
+<td style="text-align: right;">24.24</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P14</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.82</td>
+<td style="text-align: right;">0.96</td>
+<td style="text-align: right;">18.20</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P15</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.88</td>
+<td style="text-align: right;">0.89</td>
+<td style="text-align: right;">13.62</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P16</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.77</td>
+<td style="text-align: right;">0.53</td>
+<td style="text-align: right;">10.05</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P17</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.79</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">23.26</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Design balance. The difficulty x strength grid is crossed exactly, so every cell should appear once per set - i.e.&nbsp;<code>n_sets</code> times:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Illusion_Strength, Difference_Abs) <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Difference_Abs, <span class="at">values_from =</span> n, <span class="at">names_sort =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Illusion_Strength</th>
+<th style="text-align: right;">0.025</th>
+<th style="text-align: right;">0.05</th>
+<th style="text-align: left;">0.1</th>
+<th style="text-align: right;">0.25</th>
+<th style="text-align: left;">0.5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">-1.00</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: left;">150</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: left;">150</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">-0.50</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: left;">150</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: left;">150</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">0.00</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: left;">150</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: left;">150</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">0.50</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: left;">150</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: left;">150</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1.00</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: left;">150</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: left;">150</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The sign of the difference is balanced <em>within</em> each strength level, so these should be close to half and half rather than exact:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Illusion_Strength, Difference_Side) <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Difference_Side, <span class="at">values_from =</span> n) <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Illusion_Strength</th>
+<th style="text-align: right;">Left</th>
+<th style="text-align: right;">Right</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">-1.00</td>
+<td style="text-align: right;">371</td>
+<td style="text-align: right;">379</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">-0.50</td>
+<td style="text-align: right;">379</td>
+<td style="text-align: right;">371</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">0.00</td>
+<td style="text-align: right;">368</td>
+<td style="text-align: right;">382</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">0.50</td>
+<td style="text-align: right;">385</td>
+<td style="text-align: right;">365</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1.00</td>
+<td style="text-align: right;">382</td>
+<td style="text-align: right;">368</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The screened factors are assigned by balanced randomisation, so each level should be close to equally frequent (exactly so for the two-level ones):</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">"Size"</span>, <span class="st">"Gap"</span>, <span class="st">"Density"</span>, <span class="st">"Dither_Size"</span>, <span class="st">"Equiluminant"</span>, <span class="st">"Size_Panel_Mode"</span>),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  \(f) {</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    df <span class="sc">|&gt;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">count</span>(.data[[f]]) <span class="sc">|&gt;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">Level =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">Factor =</span> f, <span class="at">Level =</span> <span class="fu">as.character</span>(Level), <span class="at">.before =</span> <span class="dv">1</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Factor</th>
+<th style="text-align: right;">Level</th>
+<th style="text-align: left;">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Size</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: left;">1249</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Size</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: left;">1246</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Size</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: left;">1255</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gap</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">1245</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gap</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: left;">1245</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gap</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: left;">1260</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Density</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: left;">1258</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Density</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: left;">1246</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Density</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">1246</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dither_Size</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">1241</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dither_Size</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">1251</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dither_Size</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: left;">1258</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Equiluminant</td>
+<td style="text-align: right;">FALSE</td>
+<td style="text-align: left;">1873</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Equiluminant</td>
+<td style="text-align: right;">TRUE</td>
+<td style="text-align: left;">1877</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Size_Panel_Mode</td>
+<td style="text-align: right;">fill</td>
+<td style="text-align: left;">1871</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Size_Panel_Mode</td>
+<td style="text-align: right;">match</td>
+<td style="text-align: left;">1879</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="duration" class="level2">
+<h2 class="anchored" data-anchor-id="duration">Duration</h2>
+<p>How long the task actually takes, which is what the session length (<code>n_sets</code>) has to be set against. Two clocks are logged and they line up: <code>start_time</code> / <code>end_time</code> are wall clock (ISO, UTC), while <code>stimulus_onset</code> is <code>performance.now()</code>, i.e.&nbsp;milliseconds since the page loaded. Since the page loads at <code>start_time</code>, the two can be combined to split the session into its parts.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>durations <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Participant, order) <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">trial_end =</span> stimulus_onset <span class="sc">+</span> rt,  <span class="co"># ms since page load</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">gap =</span> (stimulus_onset <span class="sc">-</span> <span class="fu">lag</span>(trial_end)) <span class="sc">/</span> <span class="dv">1000</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">after_break =</span> block <span class="sc">!=</span> <span class="fu">lag</span>(block, <span class="at">default =</span> <span class="fu">first</span>(block)),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Participant</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Trials =</span> <span class="fu">n</span>(),</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Total =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(<span class="fu">ymd_hms</span>(end_time[<span class="dv">1</span>]), <span class="fu">ymd_hms</span>(start_time[<span class="dv">1</span>]), <span class="at">units =</span> <span class="st">"mins"</span>)),</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Instructions =</span> <span class="fu">first</span>(stimulus_onset) <span class="sc">/</span> <span class="dv">60000</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">Breaks =</span> <span class="fu">sum</span>(gap[after_break], <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="dv">60</span>,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">Task =</span> (<span class="fu">last</span>(trial_end) <span class="sc">-</span> <span class="fu">first</span>(stimulus_onset)) <span class="sc">/</span> <span class="dv">60000</span>,</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Participant</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">Trials_time =</span> Task <span class="sc">-</span> Breaks,</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sec_per_trial =</span> Trials_time <span class="sc">*</span> <span class="dv">60</span> <span class="sc">/</span> Trials,</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">Residual =</span> (Total <span class="sc">-</span> Instructions <span class="sc">-</span> Trials_time <span class="sc">-</span> Breaks) <span class="sc">*</span> <span class="dv">60</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>durations <span class="sc">|&gt;</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Participant, Trials, Total, Instructions, Trials_time, Breaks, Sec_per_trial, Residual) <span class="sc">|&gt;</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 16%">
+<col style="width: 15%">
+<col style="width: 8%">
+<col style="width: 17%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Participant</th>
+<th style="text-align: right;">Trials</th>
+<th style="text-align: right;">Total</th>
+<th style="text-align: right;">Instructions</th>
+<th style="text-align: right;">Trials_time</th>
+<th style="text-align: right;">Breaks</th>
+<th style="text-align: right;">Sec_per_trial</th>
+<th style="text-align: right;">Residual</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">P02</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">9.96</td>
+<td style="text-align: right;">0.79</td>
+<td style="text-align: right;">8.81</td>
+<td style="text-align: right;">0.35</td>
+<td style="text-align: right;">2.11</td>
+<td style="text-align: right;">0.67</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P03</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">20.45</td>
+<td style="text-align: right;">0.99</td>
+<td style="text-align: right;">9.77</td>
+<td style="text-align: right;">9.69</td>
+<td style="text-align: right;">2.34</td>
+<td style="text-align: right;">-0.10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P04</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">12.08</td>
+<td style="text-align: right;">2.45</td>
+<td style="text-align: right;">9.08</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">2.18</td>
+<td style="text-align: right;">0.19</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P06</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">12.44</td>
+<td style="text-align: right;">2.15</td>
+<td style="text-align: right;">9.10</td>
+<td style="text-align: right;">1.20</td>
+<td style="text-align: right;">2.18</td>
+<td style="text-align: right;">-0.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P07</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">26.02</td>
+<td style="text-align: right;">1.04</td>
+<td style="text-align: right;">22.33</td>
+<td style="text-align: right;">2.64</td>
+<td style="text-align: right;">5.36</td>
+<td style="text-align: right;">0.21</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P08</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">14.70</td>
+<td style="text-align: right;">0.98</td>
+<td style="text-align: right;">13.33</td>
+<td style="text-align: right;">0.38</td>
+<td style="text-align: right;">3.20</td>
+<td style="text-align: right;">0.31</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P09</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">14.23</td>
+<td style="text-align: right;">0.76</td>
+<td style="text-align: right;">10.83</td>
+<td style="text-align: right;">2.64</td>
+<td style="text-align: right;">2.60</td>
+<td style="text-align: right;">-0.02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P10</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">14.82</td>
+<td style="text-align: right;">2.52</td>
+<td style="text-align: right;">10.97</td>
+<td style="text-align: right;">1.33</td>
+<td style="text-align: right;">2.63</td>
+<td style="text-align: right;">0.05</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P11</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">16.45</td>
+<td style="text-align: right;">3.32</td>
+<td style="text-align: right;">10.15</td>
+<td style="text-align: right;">2.47</td>
+<td style="text-align: right;">2.43</td>
+<td style="text-align: right;">30.88</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P12</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">15.79</td>
+<td style="text-align: right;">1.61</td>
+<td style="text-align: right;">13.36</td>
+<td style="text-align: right;">0.82</td>
+<td style="text-align: right;">3.21</td>
+<td style="text-align: right;">-0.09</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P13</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">24.24</td>
+<td style="text-align: right;">1.74</td>
+<td style="text-align: right;">10.04</td>
+<td style="text-align: right;">12.46</td>
+<td style="text-align: right;">2.41</td>
+<td style="text-align: right;">0.35</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P14</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">18.20</td>
+<td style="text-align: right;">2.05</td>
+<td style="text-align: right;">11.93</td>
+<td style="text-align: right;">4.22</td>
+<td style="text-align: right;">2.86</td>
+<td style="text-align: right;">0.38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P15</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">13.62</td>
+<td style="text-align: right;">1.56</td>
+<td style="text-align: right;">11.62</td>
+<td style="text-align: right;">0.45</td>
+<td style="text-align: right;">2.79</td>
+<td style="text-align: right;">-0.21</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P16</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">10.05</td>
+<td style="text-align: right;">0.90</td>
+<td style="text-align: right;">8.80</td>
+<td style="text-align: right;">0.36</td>
+<td style="text-align: right;">2.11</td>
+<td style="text-align: right;">-0.77</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P17</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">23.26</td>
+<td style="text-align: right;">1.27</td>
+<td style="text-align: right;">9.20</td>
+<td style="text-align: right;">12.79</td>
+<td style="text-align: right;">2.21</td>
+<td style="text-align: right;">0.30</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>durations <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(Total, Instructions, Trials_time, Breaks, Sec_per_trial),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">mean =</span> mean, <span class="at">min =</span> min, <span class="at">max =</span> max)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">"Part"</span>, <span class="st">"Stat"</span>), <span class="at">names_pattern =</span> <span class="st">"(.*)_(mean|min|max)"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Stat, <span class="at">values_from =</span> value) <span class="sc">|&gt;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Part</th>
+<th style="text-align: left;">mean</th>
+<th style="text-align: left;">min</th>
+<th style="text-align: left;">max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Total</td>
+<td style="text-align: left;">16.42</td>
+<td style="text-align: left;">9.96</td>
+<td style="text-align: left;">26.02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Instructions</td>
+<td style="text-align: left;">1.61</td>
+<td style="text-align: left;">0.76</td>
+<td style="text-align: left;">3.32</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Trials_time</td>
+<td style="text-align: left;">11.29</td>
+<td style="text-align: left;">8.80</td>
+<td style="text-align: left;">22.33</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Breaks</td>
+<td style="text-align: left;">3.49</td>
+<td style="text-align: left;">0.35</td>
+<td style="text-align: left;">12.79</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sec_per_trial</td>
+<td style="text-align: left;">2.71</td>
+<td style="text-align: left;">2.11</td>
+<td style="text-align: left;">5.36</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Composition of each session:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>durations <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Participant, Instructions, Trials_time, Breaks) <span class="sc">|&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>Participant, <span class="at">names_to =</span> <span class="st">"Part"</span>, <span class="at">values_to =</span> <span class="st">"Minutes"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Part =</span> <span class="fu">factor</span>(</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    Part,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Instructions"</span>, <span class="st">"Trials_time"</span>, <span class="st">"Breaks"</span>),</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Instructions"</span>, <span class="st">"Trials"</span>, <span class="st">"Breaks"</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Participant, <span class="at">y =</span> Minutes, <span class="at">fill =</span> Part)) <span class="sc">+</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># reverse = TRUE so the parts read in chronological order once flipped</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="fu">position_stack</span>(<span class="at">reverse =</span> <span class="cn">TRUE</span>)) <span class="sc">+</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">Instructions =</span> <span class="st">"#78909C"</span>, <span class="at">Trials =</span> <span class="st">"#9C27B0"</span>, <span class="at">Breaks =</span> <span class="st">"#FFB300"</span>)) <span class="sc">+</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Minutes"</span>, <span class="at">fill =</span> <span class="cn">NULL</span>, <span class="at">title =</span> <span class="st">"Session duration"</span>) <span class="sc">+</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_modern</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="analysis_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Per block, to see whether people slow down or speed up as the session goes on. <code>Break_after</code> is the self-paced break screen that followed the block.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>by_trial <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Participant, order) <span class="sc">|&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">trial_end =</span> stimulus_onset <span class="sc">+</span> rt,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">gap =</span> (stimulus_onset <span class="sc">-</span> <span class="fu">lag</span>(trial_end)) <span class="sc">/</span> <span class="dv">1000</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">prev_block =</span> <span class="fu">lag</span>(block),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Participant</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"># The break that followed a block is the gap sitting on the first trial of the next one</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>breaks <span class="ot">&lt;-</span> by_trial <span class="sc">|&gt;</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(block <span class="sc">!=</span> prev_block) <span class="sc">|&gt;</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Participant, <span class="at">block =</span> prev_block, <span class="at">Break_after =</span> gap)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>by_trial <span class="sc">|&gt;</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">Trials =</span> <span class="fu">n</span>(),</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">Minutes =</span> (<span class="fu">last</span>(trial_end) <span class="sc">-</span> <span class="fu">first</span>(stimulus_onset)) <span class="sc">/</span> <span class="dv">60000</span>,</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">RT_median =</span> <span class="fu">median</span>(RT),</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">Error =</span> <span class="fu">mean</span>(Error),</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Participant, block)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(breaks, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Participant"</span>, <span class="st">"block"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Participant</th>
+<th style="text-align: right;">block</th>
+<th style="text-align: right;">Trials</th>
+<th style="text-align: right;">Minutes</th>
+<th style="text-align: right;">RT_median</th>
+<th style="text-align: right;">Error</th>
+<th style="text-align: right;">Break_after</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">P02</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.29</td>
+<td style="text-align: right;">0.58</td>
+<td style="text-align: right;">0.29</td>
+<td style="text-align: right;">11.57</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P02</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.20</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: right;">5.41</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P02</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.20</td>
+<td style="text-align: right;">0.53</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: right;">4.26</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P02</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">2.12</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P03</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.54</td>
+<td style="text-align: right;">0.76</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">16.61</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P03</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.76</td>
+<td style="text-align: right;">0.73</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">510.38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P03</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.28</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">0.29</td>
+<td style="text-align: right;">54.41</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P03</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">2.18</td>
+<td style="text-align: right;">0.53</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P04</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.29</td>
+<td style="text-align: right;">0.58</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">9.11</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P04</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.22</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">0.32</td>
+<td style="text-align: right;">20.83</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P04</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.33</td>
+<td style="text-align: right;">0.58</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">2.72</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P04</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">2.24</td>
+<td style="text-align: right;">0.60</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P06</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.32</td>
+<td style="text-align: right;">0.56</td>
+<td style="text-align: right;">0.30</td>
+<td style="text-align: right;">18.03</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P06</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.31</td>
+<td style="text-align: right;">0.56</td>
+<td style="text-align: right;">0.32</td>
+<td style="text-align: right;">34.07</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P06</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.27</td>
+<td style="text-align: right;">0.56</td>
+<td style="text-align: right;">0.35</td>
+<td style="text-align: right;">19.90</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P06</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">2.20</td>
+<td style="text-align: right;">0.55</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P07</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">6.15</td>
+<td style="text-align: right;">2.51</td>
+<td style="text-align: right;">0.11</td>
+<td style="text-align: right;">73.05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P07</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">5.28</td>
+<td style="text-align: right;">2.65</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">4.90</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P07</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">5.90</td>
+<td style="text-align: right;">3.38</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">80.47</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P07</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">5.01</td>
+<td style="text-align: right;">2.42</td>
+<td style="text-align: right;">0.11</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P08</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">3.40</td>
+<td style="text-align: right;">1.51</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">7.95</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P08</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">3.33</td>
+<td style="text-align: right;">1.40</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">3.91</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P08</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">3.59</td>
+<td style="text-align: right;">1.76</td>
+<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">11.07</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P08</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">3.01</td>
+<td style="text-align: right;">1.33</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P09</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.66</td>
+<td style="text-align: right;">0.87</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">25.16</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P09</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.88</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">90.21</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P09</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.74</td>
+<td style="text-align: right;">1.05</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">42.76</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P09</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">2.55</td>
+<td style="text-align: right;">0.84</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P10</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.86</td>
+<td style="text-align: right;">1.01</td>
+<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">23.03</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P10</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.66</td>
+<td style="text-align: right;">0.88</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: right;">28.17</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P10</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.75</td>
+<td style="text-align: right;">0.89</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">28.75</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P10</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">2.70</td>
+<td style="text-align: right;">0.99</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.57</td>
+<td style="text-align: right;">0.82</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">41.41</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P11</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.62</td>
+<td style="text-align: right;">0.93</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">48.25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P11</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.53</td>
+<td style="text-align: right;">0.78</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">58.64</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P11</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">2.42</td>
+<td style="text-align: right;">0.80</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P12</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">3.36</td>
+<td style="text-align: right;">1.52</td>
+<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">17.08</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P12</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">3.35</td>
+<td style="text-align: right;">1.47</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">27.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P12</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">3.51</td>
+<td style="text-align: right;">1.58</td>
+<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">5.12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P12</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">3.15</td>
+<td style="text-align: right;">1.29</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P13</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.67</td>
+<td style="text-align: right;">0.90</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: right;">203.79</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P13</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.44</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">127.57</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P13</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.55</td>
+<td style="text-align: right;">0.89</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">415.99</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P13</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">2.38</td>
+<td style="text-align: right;">0.73</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P14</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">3.01</td>
+<td style="text-align: right;">1.09</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">124.19</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P14</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.72</td>
+<td style="text-align: right;">0.92</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">125.58</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P14</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.64</td>
+<td style="text-align: right;">0.88</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">3.43</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P14</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">3.55</td>
+<td style="text-align: right;">1.03</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P15</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.84</td>
+<td style="text-align: right;">0.94</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">9.45</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P15</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.54</td>
+<td style="text-align: right;">0.74</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">8.11</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P15</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.88</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">9.18</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P15</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">3.37</td>
+<td style="text-align: right;">1.43</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P16</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.21</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">10.19</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P16</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.24</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">6.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P16</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.15</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">5.22</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P16</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">2.21</td>
+<td style="text-align: right;">0.57</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P17</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.31</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">54.74</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P17</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.31</td>
+<td style="text-align: right;">0.52</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">628.16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P17</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">2.38</td>
+<td style="text-align: right;">0.46</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">84.34</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P17</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">2.20</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>At 2.7 s per trial, a set of 20 trials costs about 0.9 min of trial time, so <code>n_sets</code> can be priced directly: the instruction phase is a fixed overhead on top, and the breaks are self-paced.</p>
+</section>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Error =</span> <span class="fu">mean</span>(Error), <span class="at">.by =</span> <span class="fu">c</span>(Difference_Abs)) <span class="sc">|&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(Difference_Abs), <span class="at">y =</span> Error)) <span class="sc">+</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"#9C27B0"</span>) <span class="sc">+</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Area difference"</span>, <span class="at">y =</span> <span class="st">"Error rate"</span>, <span class="at">title =</span> <span class="st">"Difficulty"</span>) <span class="sc">+</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_modern</span>()</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> RT)) <span class="sc">+</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">40</span>, <span class="at">fill =</span> <span class="st">"#9C27B0"</span>) <span class="sc">+</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"RT (s)"</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">title =</span> <span class="st">"Reaction times"</span>) <span class="sc">+</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_modern</span>()</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="analysis_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">glm</span>(ResponseRight <span class="sc">~</span> Difference, <span class="at">data =</span> df, <span class="at">family =</span> <span class="st">"binomial"</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">estimate_relation</span>(m, <span class="at">length =</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="analysis_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="models" class="level2">
+<h2 class="anchored" data-anchor-id="models">Models</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">glm</span>(Error <span class="sc">~</span> <span class="fu">poly</span>(Illusion_Strength, <span class="dv">2</span>) <span class="sc">*</span> <span class="fu">as.factor</span>(Difference_Abs),</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">data =</span> df, <span class="at">family =</span> <span class="st">"binomial"</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">estimate_prediction</span>(m) <span class="sc">|&gt;</span> </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Difference_Abs <span class="sc">&lt;</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Illusion_Strength =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(Illusion_Strength))) <span class="sc">|&gt;</span> </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Illusion_Strength, <span class="at">y =</span> Predicted, <span class="at">group =</span> Difference_Abs)) <span class="sc">+</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">fill =</span> Difference_Abs, <span class="at">ymin =</span> CI_low, <span class="at">ymax=</span> CI_high), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">color =</span> Difference_Abs)) <span class="sc">+</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">"red"</span>, <span class="at">high =</span> <span class="st">"green"</span>) <span class="sc">+</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"red"</span>, <span class="at">high =</span> <span class="st">"green"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="analysis_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">lm</span>(RT <span class="sc">~</span> Illusion_Strength <span class="sc">*</span> <span class="fu">as.factor</span>(Difference_Abs), </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">filter</span>(df, Error <span class="sc">==</span> <span class="cn">FALSE</span>))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">estimate_prediction</span>(m) <span class="sc">|&gt;</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Difference_Abs <span class="sc">&lt;</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Illusion_Strength =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(Illusion_Strength))) <span class="sc">|&gt;</span> </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Illusion_Strength, <span class="at">y =</span> Predicted, <span class="at">group =</span> Difference_Abs)) <span class="sc">+</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">fill =</span> Difference_Abs, <span class="at">ymin =</span> CI_low, <span class="at">ymax=</span> CI_high), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">color =</span> Difference_Abs)) <span class="sc">+</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">"red"</span>, <span class="at">high =</span> <span class="st">"green"</span>) <span class="sc">+</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"red"</span>, <span class="at">high =</span> <span class="st">"green"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="analysis_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="modulation" class="level2">
+<h2 class="anchored" data-anchor-id="modulation">Modulation</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>rez <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(var <span class="cf">in</span> <span class="fu">c</span>(<span class="st">"Illusion_Strength"</span> ,<span class="st">"Equiluminant"</span>, <span class="st">"Size"</span>, <span class="st">"Gap"</span>, <span class="st">"Density"</span>, <span class="st">"Dither_Size"</span>, <span class="st">"Size_Panel"</span>)) {</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span>var <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Size_Panel"</span>, <span class="st">"Illusion_Strength"</span>)) {</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    var <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"as.factor("</span>, var, <span class="st">")"</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  f <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Error ~ Difference_Abs * "</span>, var)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="fu">glm</span>(f, <span class="at">family =</span> <span class="st">"binomial"</span>, <span class="at">data =</span> df)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  rez <span class="ot">&lt;-</span> <span class="fu">parameters</span>(m) <span class="sc">|&gt;</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tail</span>(<span class="at">n =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Variable =</span> var) <span class="sc">|&gt;</span> </span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Variable, Parameter, Coefficient, p) <span class="sc">|&gt;</span> </span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rbind</span>(rez)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="fu">arrange</span>(rez, p)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">glm</span>(Error <span class="sc">~</span> Difference_Abs,</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">data =</span> df, <span class="at">family =</span> <span class="st">"binomial"</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">estimate_prediction</span>(m, <span class="at">by =</span> <span class="st">"Difference_Abs"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="analysis_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="summary-stats" class="level2">
+<h2 class="anchored" data-anchor-id="summary-stats">Summary stats</h2>
+<section id="sample-size" class="level4">
+<h4 class="anchored" data-anchor-id="sample-size">Sample size</h4>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Participants =</span> <span class="fu">n_distinct</span>(Participant),</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">Trials =</span> <span class="fu">n</span>(),</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">Trials_per_person =</span> <span class="fu">n</span>() <span class="sc">/</span> <span class="fu">n_distinct</span>(Participant)) <span class="sc">|&gt;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Participants</th>
+<th style="text-align: right;">Trials</th>
+<th style="text-align: right;">Trials_per_person</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">3750</td>
+<td style="text-align: right;">250</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="accuracy" class="level4">
+<h4 class="anchored" data-anchor-id="accuracy">Accuracy</h4>
+<p>Accuracy when the red disc is the truly larger or smaller one, against the baseline (both panels purple, no red/blue contrast):</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Red_Is =</span> <span class="fu">case_when</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>      Red_Side <span class="sc">==</span> <span class="st">"None"</span>          <span class="sc">~</span> <span class="st">"Purple (no red/blue contrast)"</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>      Red_Side <span class="sc">==</span> Difference_Side <span class="sc">~</span> <span class="st">"Red larger"</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">.default                    =</span> <span class="st">"Red smaller"</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Trials =</span> <span class="fu">n</span>(), <span class="at">Correct =</span> <span class="fu">mean</span>(correct), <span class="at">.by =</span> Red_Is) <span class="sc">|&gt;</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Red_Is</th>
+<th style="text-align: right;">Trials</th>
+<th style="text-align: right;">Correct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Purple (no red/blue contrast)</td>
+<td style="text-align: right;">750</td>
+<td style="text-align: right;">0.80</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Red smaller</td>
+<td style="text-align: right;">1483</td>
+<td style="text-align: right;">0.83</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Red larger</td>
+<td style="text-align: right;">1517</td>
+<td style="text-align: right;">0.74</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Accuracy per participant (positive <code>Diff</code> means more accurate when red is smaller):</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Red_Side <span class="sc">!=</span> <span class="st">"None"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Red_Is =</span> <span class="fu">if_else</span>(Red_Side <span class="sc">==</span> Difference_Side, <span class="st">"Larger"</span>, <span class="st">"Smaller"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Correct =</span> <span class="fu">mean</span>(correct), <span class="at">.by =</span> <span class="fu">c</span>(Participant, Red_Is)) <span class="sc">|&gt;</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Red_Is, <span class="at">values_from =</span> Correct, <span class="at">names_prefix =</span> <span class="st">"Red_"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Diff =</span> Red_Smaller <span class="sc">-</span> Red_Larger) <span class="sc">|&gt;</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Participant</th>
+<th style="text-align: right;">Red_Smaller</th>
+<th style="text-align: right;">Red_Larger</th>
+<th style="text-align: right;">Diff</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">P02</td>
+<td style="text-align: right;">0.77</td>
+<td style="text-align: right;">0.64</td>
+<td style="text-align: right;">0.13</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P03</td>
+<td style="text-align: right;">0.77</td>
+<td style="text-align: right;">0.81</td>
+<td style="text-align: right;">-0.04</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P04</td>
+<td style="text-align: right;">0.81</td>
+<td style="text-align: right;">0.69</td>
+<td style="text-align: right;">0.12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P06</td>
+<td style="text-align: right;">0.94</td>
+<td style="text-align: right;">0.42</td>
+<td style="text-align: right;">0.52</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P07</td>
+<td style="text-align: right;">0.88</td>
+<td style="text-align: right;">0.93</td>
+<td style="text-align: right;">-0.05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P08</td>
+<td style="text-align: right;">0.80</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">0.05</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P09</td>
+<td style="text-align: right;">0.88</td>
+<td style="text-align: right;">0.68</td>
+<td style="text-align: right;">0.20</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P10</td>
+<td style="text-align: right;">0.71</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">-0.05</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P11</td>
+<td style="text-align: right;">0.87</td>
+<td style="text-align: right;">0.86</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P12</td>
+<td style="text-align: right;">0.82</td>
+<td style="text-align: right;">0.66</td>
+<td style="text-align: right;">0.16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P13</td>
+<td style="text-align: right;">0.84</td>
+<td style="text-align: right;">0.67</td>
+<td style="text-align: right;">0.18</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P14</td>
+<td style="text-align: right;">0.92</td>
+<td style="text-align: right;">0.73</td>
+<td style="text-align: right;">0.19</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P15</td>
+<td style="text-align: right;">0.87</td>
+<td style="text-align: right;">0.89</td>
+<td style="text-align: right;">-0.02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P16</td>
+<td style="text-align: right;">0.86</td>
+<td style="text-align: right;">0.69</td>
+<td style="text-align: right;">0.17</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P17</td>
+<td style="text-align: right;">0.68</td>
+<td style="text-align: right;">0.88</td>
+<td style="text-align: right;">-0.20</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+<section id="mixed-effects-models" class="level2">
+<h2 class="anchored" data-anchor-id="mixed-effects-models">Mixed-effects models</h2>
+<p>Logistic mixed models of the response (<code>ResponseRight</code>). A positive <code>Illusion_Strength</code> coefficient means the red disc is judged smaller. Random slopes model between-participant variation in sensitivity to area difference and illusion strength.</p>
+<section id="preparation" class="level3">
+<h3 class="anchored" data-anchor-id="preparation">Preparation</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Difference_10pct =</span> Difference <span class="sc">/</span> <span class="fl">0.1</span>,             <span class="co"># area difference, in units of 10%</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Illusion_Strength_f =</span> <span class="fu">factor</span>(Illusion_Strength)  <span class="co"># categorical version</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">glmerControl</span>(<span class="at">optimizer =</span> <span class="st">"bobyqa"</span>, <span class="at">optCtrl =</span> <span class="fu">list</span>(<span class="at">maxfun =</span> <span class="fl">2e5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="core-model" class="level3">
+<h3 class="anchored" data-anchor-id="core-model">Core model</h3>
+<p>Singular-fit check: <code>FALSE</code> is fine. If <code>TRUE</code>, refit with uncorrelated random effects.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>m_core <span class="ot">&lt;-</span> <span class="fu">glmer</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  ResponseRight <span class="sc">~</span> Difference_10pct <span class="sc">+</span> Illusion_Strength <span class="sc">+</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span> <span class="sc">+</span> Difference_10pct <span class="sc">+</span> Illusion_Strength <span class="sc">|</span> Participant),</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df, <span class="at">family =</span> binomial, <span class="at">control =</span> ctrl</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="fu">isSingular</span>(m_core)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">parameters</span>(m_core)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># Fixed Effects
+
+Parameter         | Log-Odds |   SE |         95% CI |     z |      p
+---------------------------------------------------------------------
+(Intercept)       |    -0.10 | 0.11 | [-0.33,  0.12] | -0.88 | 0.377 
+Difference 10pct  |    -1.17 | 0.14 | [-1.44, -0.89] | -8.24 | &lt; .001
+Illusion Strength |     0.42 | 0.20 | [ 0.02,  0.82] |  2.05 | 0.040 
+
+# Random Effects
+
+Parameter                                             | Coefficient
+-------------------------------------------------------------------
+SD (Intercept: Participant)                           |        0.41
+SD (Difference_10pct: Participant)                    |        0.51
+SD (Illusion_Strength: Participant)                   |        0.75
+Cor (Intercept~Difference_10pct: Participant)         |        0.19
+Cor (Intercept~Illusion_Strength: Participant)        |       -0.25
+Cor (Difference_10pct~Illusion_Strength: Participant) |        0.28</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Uncertainty intervals (equal-tailed) and p-values (two-tailed) computed
+  using a Wald z-distribution approximation.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+The model has a log- or logit-link. Consider using `exponentiate =
+  TRUE` to interpret coefficients as ratios.</code></pre>
+</div>
+</div>
+<p>Wald p-values are optimistic with few participants. The likelihood-ratio test and bootstrap below are more reliable checks.</p>
+<p>Likelihood-ratio test of <code>Illusion_Strength</code>: compares the model with and without it. A small <code>Pr(&gt;Chisq)</code> indicates a better fit than expected by chance when it is included.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>m_null <span class="ot">&lt;-</span> <span class="fu">update</span>(m_core, . <span class="sc">~</span> . <span class="sc">-</span> Illusion_Strength)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(m_null, m_core)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Data: df
+Models:
+m_null: ResponseRight ~ Difference_10pct + (1 + Difference_10pct + Illusion_Strength | Participant)
+m_core: ResponseRight ~ Difference_10pct + Illusion_Strength + (1 + Difference_10pct + Illusion_Strength | Participant)
+       npar    AIC    BIC  logLik -2*log(L) Chisq Df Pr(&gt;Chisq)  
+m_null    8 3249.0 3298.8 -1616.5    3233.0                      
+m_core    9 3247.3 3303.3 -1614.6    3229.3 3.718  1    0.05383 .
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Bootstrap 95% confidence intervals for the fixed effects (500 simulations).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(m_core, <span class="at">method =</span> <span class="st">"boot"</span>, <span class="at">nsim =</span> <span class="dv">500</span>, <span class="at">parm =</span> <span class="st">"beta_"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Computing bootstrap confidence intervals ...</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+10 message(s): boundary (singular) fit: see help('isSingular')
+2 warning(s): Model failed to converge with max|grad| = 0.0613804 (tol = 0.002, component 1)
+  See ?lme4::convergence and ?lme4::troubleshooting. (and others)</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                        2.5 %     97.5 %
+(Intercept)       -0.35468423  0.1184665
+Difference_10pct  -1.45758999 -0.9082146
+Illusion_Strength  0.04796233  0.8189996</code></pre>
+</div>
+</div>
+</section>
+<section id="individual-differences" class="level3">
+<h3 class="anchored" data-anchor-id="individual-differences">Individual differences</h3>
+<p>Each point shows one participant’s estimated illusion effect from the mixed model (log-odds per unit of illusion strength). Positive values suggest a bias towards judging the red disc as smaller than the blue disc. Negative values suggest a bias in the opposite direction.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>ind <span class="ot">&lt;-</span> <span class="fu">coef</span>(m_core)<span class="sc">$</span>Participant <span class="sc">|&gt;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"Participant"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(Participant, <span class="at">Slope =</span> Illusion_Strength)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>ind <span class="sc">|&gt;</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Participant, Slope), <span class="at">y =</span> Slope)) <span class="sc">+</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="st">"#9C27B0"</span>) <span class="sc">+</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Illusion effect (log-odds per unit of illusion strength)"</span>) <span class="sc">+</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_modern</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="analysis_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="linear-vs-categorical-illusion-strength" class="level3">
+<h3 class="anchored" data-anchor-id="linear-vs-categorical-illusion-strength">Linear vs categorical illusion strength</h3>
+<p>Tests whether treating illusion strength as categorical improves on a linear term (likelihood-ratio test; lower AIC/BIC indicates a better fit after penalising complexity). If it doesn’t, the linear term is adequate.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>m_cat <span class="ot">&lt;-</span> <span class="fu">update</span>(m_core, . <span class="sc">~</span> . <span class="sc">-</span> Illusion_Strength <span class="sc">+</span> Illusion_Strength_f)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(m_core, m_cat)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Data: df
+Models:
+m_core: ResponseRight ~ Difference_10pct + Illusion_Strength + (1 + Difference_10pct + Illusion_Strength | Participant)
+m_cat: ResponseRight ~ Difference_10pct + (1 + Difference_10pct + Illusion_Strength | Participant) + Illusion_Strength_f
+       npar    AIC    BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
+m_core    9 3247.3 3303.3 -1614.6    3229.3                     
+m_cat    12 3253.2 3328.0 -1614.6    3229.2 0.0322  3     0.9985</code></pre>
+</div>
+</div>
+</section>
+<section id="moderators" class="level3">
+<h3 class="anchored" data-anchor-id="moderators">Moderators</h3>
+<p>Each factor is included as a main effect plus its interaction with <code>Illusion_Strength</code>. The likelihood-ratio test compares this against the model without the interaction. p-values are corrected across the 6 factors using Holm, Bonferroni and Benjamini-Hochberg methods.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>factors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Size_f"</span>, <span class="st">"Gap_f"</span>, <span class="st">"Density_f"</span>, <span class="st">"Dither_Size_f"</span>,</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Equiluminant"</span>, <span class="st">"Size_Panel_Mode"</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>moderators <span class="ot">&lt;-</span> <span class="fu">map</span>(factors, \(f) {</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  m0 <span class="ot">&lt;-</span> <span class="fu">update</span>(m_core, <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">". ~ . +"</span>, f)))</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  m1 <span class="ot">&lt;-</span> <span class="fu">update</span>(m_core, <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">". ~ . +"</span>, f, <span class="st">"+ Illusion_Strength:"</span>, f)))</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> <span class="fu">anova</span>(m0, m1)</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">Factor =</span> f, <span class="at">Chisq =</span> a<span class="sc">$</span>Chisq[<span class="dv">2</span>], <span class="at">df =</span> a<span class="sc">$</span>Df[<span class="dv">2</span>], <span class="at">p =</span> a<span class="sc">$</span><span class="st">`</span><span class="at">Pr(&gt;Chisq)</span><span class="st">`</span>[<span class="dv">2</span>])</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">|&gt;</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">p_holm =</span> <span class="fu">p.adjust</span>(p, <span class="at">method =</span> <span class="st">"holm"</span>),</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">p_bonferroni =</span> <span class="fu">p.adjust</span>(p, <span class="at">method =</span> <span class="st">"bonferroni"</span>),</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">p_bh =</span> <span class="fu">p.adjust</span>(p, <span class="at">method =</span> <span class="st">"BH"</span>)</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a><span class="fu">display</span>(moderators)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Factor</th>
+<th style="text-align: right;">Chisq</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: left;">p</th>
+<th style="text-align: right;">p_holm</th>
+<th style="text-align: right;">p_bonferroni</th>
+<th style="text-align: left;">p_bh</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Size_f</td>
+<td style="text-align: right;">3.14</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">0.21</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">0.62</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gap_f</td>
+<td style="text-align: right;">0.88</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">0.64</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">0.77</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Density_f</td>
+<td style="text-align: right;">0.38</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">0.83</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">0.83</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dither_Size_f</td>
+<td style="text-align: right;">8.98</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">0.01</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: left;">0.07</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Equiluminant</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">0.58</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">0.77</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Size_Panel_Mode</td>
+<td style="text-align: right;">0.84</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">0.36</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">0.72</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="illusion-effect-by-factor-level" class="level3">
+<h3 class="anchored" data-anchor-id="illusion-effect-by-factor-level">Illusion effect by factor level</h3>
+<p>The marginal effect of <code>Illusion_Strength</code> at each level of each factor, i.e.&nbsp;the change in the probability of a right-hand response per unit of illusion strength. Descriptive only - moderator tests above show whether levels differ.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (f <span class="cf">in</span> factors) {</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  m1 <span class="ot">&lt;-</span> <span class="fu">update</span>(m_core, <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">". ~ . +"</span>, f, <span class="st">"+ Illusion_Strength:"</span>, f)))</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">estimate_slopes</span>(m1, <span class="at">trend =</span> <span class="st">"Illusion_Strength"</span>, <span class="at">by =</span> f))</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Estimated Marginal Effects
+
+Size_f | Slope |   SE |        95% CI |    z |     p
+----------------------------------------------------
+0.25   |  0.14 | 0.05 | [ 0.03, 0.24] | 2.61 | 0.009
+0.5    |  0.08 | 0.05 | [-0.02, 0.19] | 1.58 | 0.114
+0.75   |  0.08 | 0.05 | [-0.02, 0.18] | 1.49 | 0.137
+
+Marginal effects estimated for Illusion_Strength
+Type of slope was dY/dXEstimated Marginal Effects
+
+Gap_f | Slope |   SE |        95% CI |    z |     p
+---------------------------------------------------
+0     |  0.12 | 0.05 | [ 0.01, 0.22] | 2.22 | 0.027
+0.02  |  0.10 | 0.05 | [-0.01, 0.20] | 1.81 | 0.070
+0.06  |  0.08 | 0.05 | [-0.02, 0.19] | 1.50 | 0.132
+
+Marginal effects estimated for Illusion_Strength
+Type of slope was dY/dXEstimated Marginal Effects
+
+Density_f | Slope |   SE |        95% CI |    z |     p
+-------------------------------------------------------
+0.5       |  0.10 | 0.05 | [ 0.00, 0.21] | 1.95 | 0.051
+0.75      |  0.08 | 0.05 | [-0.02, 0.19] | 1.60 | 0.110
+1         |  0.11 | 0.05 | [ 0.00, 0.21] | 2.02 | 0.044
+
+Marginal effects estimated for Illusion_Strength
+Type of slope was dY/dXEstimated Marginal Effects
+
+Dither_Size_f | Slope |   SE |        95% CI |    z |     p
+-----------------------------------------------------------
+2             |  0.03 | 0.05 | [-0.07, 0.14] | 0.64 | 0.523
+4             |  0.13 | 0.05 | [ 0.03, 0.24] | 2.46 | 0.014
+8             |  0.13 | 0.05 | [ 0.03, 0.24] | 2.48 | 0.013
+
+Marginal effects estimated for Illusion_Strength
+Type of slope was dY/dXEstimated Marginal Effects
+
+Equiluminant | Slope |   SE |        95% CI |    z |     p
+----------------------------------------------------------
+FALSE        |  0.09 | 0.05 | [-0.01, 0.19] | 1.80 | 0.072
+TRUE         |  0.11 | 0.05 | [ 0.01, 0.21] | 2.13 | 0.034
+
+Marginal effects estimated for Illusion_Strength
+Type of slope was dY/dXEstimated Marginal Effects
+
+Size_Panel_Mode | Slope |   SE |        95% CI |    z |     p
+-------------------------------------------------------------
+fill            |  0.09 | 0.05 | [-0.01, 0.19] | 1.71 | 0.088
+match           |  0.11 | 0.05 | [ 0.01, 0.21] | 2.23 | 0.026
+
+Marginal effects estimated for Illusion_Strength
+Type of slope was dY/dX</code></pre>
+</div>
+</div>
+</section>
+<section id="bayesian-core-model" class="level3">
+<h3 class="anchored" data-anchor-id="bayesian-core-model">Bayesian core model</h3>
+<p>Bayesian version of the core model, with weakly informative priors (wide normal on effects, exponential on random-effect SDs). Used as a cross-check on the mixed model above.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>m_bayes <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  ResponseRight <span class="sc">~</span> Difference_10pct <span class="sc">+</span> Illusion_Strength <span class="sc">+</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span> <span class="sc">+</span> Difference_10pct <span class="sc">+</span> Illusion_Strength <span class="sc">|</span> Participant),</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df, <span class="at">family =</span> <span class="fu">bernoulli</span>(),</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="at">class =</span> b),</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sd)),</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>, <span class="at">seed =</span> <span class="dv">123</span>,</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">refresh =</span> <span class="dv">0</span>, <span class="at">silent =</span> <span class="dv">2</span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe_posterior</span>(m_bayes, <span class="at">test =</span> <span class="st">"pd"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Summary of Posterior Distribution
+
+Parameter         | Median |         95% CI |     pd |  Rhat | ESS (tail)
+-------------------------------------------------------------------------
+(Intercept)       |  -0.10 | [-0.37,  0.19] | 77.15% | 1.004 |       1804
+Difference_10pct  |  -1.17 | [-1.51, -0.84] |   100% | 1.002 |       2046
+Illusion_Strength |   0.41 | [-0.08,  0.89] | 95.62% | 1.001 |       2004</code></pre>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

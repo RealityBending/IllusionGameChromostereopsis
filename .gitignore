@@ -53,8 +53,6 @@ data/raw/
 __pycache__/
 
 # Analysis output: contains participant-level data
-analysis/*.html
-analysis/*.md
 analysis/analysis_files/
 analysis/plots/unnamed-chunk-11-1.png
 
