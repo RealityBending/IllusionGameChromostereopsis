@@ -52,9 +52,5 @@ rsconnect/
 data/raw/
 __pycache__/
 
-# Analysis output: contains participant-level data
-analysis/analysis_files/
-analysis/plots/unnamed-chunk-11-1.png
-
 # macOS folder metadata
 .DS_Store
