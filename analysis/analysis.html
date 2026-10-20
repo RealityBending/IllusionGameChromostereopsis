@@ -192,13 +192,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Participant =</span> <span class="fu">paste0</span>(<span class="st">"P"</span>, <span class="fu">str_pad</span>(<span class="fu">match</span>(participant_id, <span class="fu">unique</span>(participant_id)), <span class="dv">2</span>, <span class="at">pad =</span> <span class="st">"0"</span>)),</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      <span class="co"># The judged attribute. `Difference` is the signed area difference, positive = left</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>      <span class="co"># disc is larger; its magnitude is task difficulty and its sign the correct answer.</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The judged attribute. `Difference` is the signed area difference, positive = left</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># disc is larger; its magnitude is task difficulty and its sign the correct answer.</span></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Difference_Abs =</span> <span class="fu">abs</span>(Difference),</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Difference_Side =</span> <span class="fu">if_else</span>(Difference <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="st">"Left"</span>, <span class="st">"Right"</span>),</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The illusion. The sign of `Illusion_Strength` says which panel holds the</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># red-leaning disc (&gt;= 0 is left), its magnitude the chromatic separation.</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">Red_Side =</span> <span class="fu">case_when</span>(</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># red-leaning disc (&gt; 0 is left), its magnitude is the chromatic separation.</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">Red_Leaning_Side =</span> <span class="fu">case_when</span>(</span>
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>      Illusion_Strength <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"Left"</span>,</span>
 <span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>      Illusion_Strength <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"Right"</span>,</span>
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">.default =</span> <span class="st">"None"</span>  <span class="co"># both panels are the same purple</span></span>
@@ -1680,43 +1680,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="accuracy" class="level4">
 <h4 class="anchored" data-anchor-id="accuracy">Accuracy</h4>
-<p>Accuracy when the red disc is the truly larger or smaller one, against the baseline (both panels purple, no red/blue contrast):</p>
+<p>Accuracy when the red-leaning disc is actually larger or smaller than the other disc, against the baseline with no red/blue difference (illusion strength = 0):</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Red_Is =</span> <span class="fu">case_when</span>(</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>      Red_Side <span class="sc">==</span> <span class="st">"None"</span>          <span class="sc">~</span> <span class="st">"Purple (no red/blue contrast)"</span>,</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>      Red_Side <span class="sc">==</span> Difference_Side <span class="sc">~</span> <span class="st">"Red larger"</span>,</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">.default                    =</span> <span class="st">"Red smaller"</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Red_Leaning_Disc_Is =</span> <span class="fu">case_when</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>      Red_Leaning_Side <span class="sc">==</span> <span class="st">"None"</span>          <span class="sc">~</span> <span class="st">"No red/blue difference (illusion strength = 0)"</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>      Red_Leaning_Side <span class="sc">==</span> Difference_Side <span class="sc">~</span> <span class="st">"Red-leaning actually larger"</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">.default                            =</span> <span class="st">"Red-leaning actually smaller"</span></span>
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Trials =</span> <span class="fu">n</span>(), <span class="at">Correct =</span> <span class="fu">mean</span>(correct), <span class="at">.by =</span> Red_Is) <span class="sc">|&gt;</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Trials =</span> <span class="fu">n</span>(), <span class="at">Correct =</span> <span class="fu">mean</span>(correct), <span class="at">.by =</span> Red_Leaning_Disc_Is) <span class="sc">|&gt;</span></span>
 <span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
-<th style="text-align: left;">Red_Is</th>
+<th style="text-align: left;">Red_Leaning_Disc_Is</th>
 <th style="text-align: right;">Trials</th>
 <th style="text-align: right;">Correct</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Purple (no red/blue contrast)</td>
+<td style="text-align: left;">No red/blue difference (illusion strength = 0)</td>
 <td style="text-align: right;">750</td>
 <td style="text-align: right;">0.80</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Red smaller</td>
+<td style="text-align: left;">Red-leaning actually smaller</td>
 <td style="text-align: right;">1483</td>
 <td style="text-align: right;">0.83</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Red larger</td>
+<td style="text-align: left;">Red-leaning actually larger</td>
 <td style="text-align: right;">1517</td>
 <td style="text-align: right;">0.74</td>
 </tr>
@@ -1724,25 +1724,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </div>
 </div>
-<p>Accuracy per participant (positive <code>Diff</code> means more accurate when red is smaller):</p>
+<p>Accuracy per participant (positive <code>Diff</code> means more accurate when the red-leaning disc is actually smaller):</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Red_Side <span class="sc">!=</span> <span class="st">"None"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Red_Is =</span> <span class="fu">if_else</span>(Red_Side <span class="sc">==</span> Difference_Side, <span class="st">"Larger"</span>, <span class="st">"Smaller"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Correct =</span> <span class="fu">mean</span>(correct), <span class="at">.by =</span> <span class="fu">c</span>(Participant, Red_Is)) <span class="sc">|&gt;</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Red_Is, <span class="at">values_from =</span> Correct, <span class="at">names_prefix =</span> <span class="st">"Red_"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Diff =</span> Red_Smaller <span class="sc">-</span> Red_Larger) <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Red_Leaning_Side <span class="sc">!=</span> <span class="st">"None"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Red_Leaning_Disc_Is =</span> <span class="fu">if_else</span>(Red_Leaning_Side <span class="sc">==</span> Difference_Side, <span class="st">"actually_larger"</span>, <span class="st">"actually_smaller"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Correct =</span> <span class="fu">mean</span>(correct), <span class="at">.by =</span> <span class="fu">c</span>(Participant, Red_Leaning_Disc_Is)) <span class="sc">|&gt;</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Red_Leaning_Disc_Is, <span class="at">values_from =</span> Correct, <span class="at">names_prefix =</span> <span class="st">"Red_leaning_"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Diff =</span> Red_leaning_actually_smaller <span class="sc">-</span> Red_leaning_actually_larger) <span class="sc">|&gt;</span></span>
 <span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">display</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 38%">
+<col style="width: 37%">
+<col style="width: 8%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Participant</th>
-<th style="text-align: right;">Red_Smaller</th>
-<th style="text-align: right;">Red_Larger</th>
+<th style="text-align: right;">Red_leaning_actually_smaller</th>
+<th style="text-align: right;">Red_leaning_actually_larger</th>
 <th style="text-align: right;">Diff</th>
 </tr>
 </thead>
@@ -1845,7 +1851,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="mixed-effects-models" class="level2">
 <h2 class="anchored" data-anchor-id="mixed-effects-models">Mixed-effects models</h2>
-<p>Logistic mixed models of the response (<code>ResponseRight</code>). A positive <code>Illusion_Strength</code> coefficient means the red disc is judged smaller. Random slopes model between-participant variation in sensitivity to area difference and illusion strength.</p>
+<p>Logistic mixed models of the probability of a right-arrow response (<code>ResponseRight</code>: <code>TRUE</code> = the participant said the right disc was larger, <code>FALSE</code> = the left disc). The two predictors are:</p>
+<ul>
+<li><code>Area_Difference_10pct</code>: the true area difference between the two discs, in units of 10% (positive = left disc larger, negative = right disc larger).</li>
+<li><code>Illusion_Strength</code>: from -1 to 1. The sign sets which side the red-leaning disc is on (positive = left, negative = right) and the magnitude the red/blue contrast. 0 = no red/blue difference.</li>
+</ul>
+<p>A positive <code>Illusion_Strength</code> coefficient means the red-leaning disc was judged smaller. Random slopes model between-participant variation in sensitivity to area difference and illusion strength.</p>
 <section id="preparation" class="level3">
 <h3 class="anchored" data-anchor-id="preparation">Preparation</h3>
 <div class="cell">
@@ -1853,11 +1864,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Difference_10pct =</span> Difference <span class="sc">/</span> <span class="fl">0.1</span>,             <span class="co"># area difference, in units of 10%</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Illusion_Strength_f =</span> <span class="fu">factor</span>(Illusion_Strength)  <span class="co"># categorical version</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">glmerControl</span>(<span class="at">optimizer =</span> <span class="st">"bobyqa"</span>, <span class="at">optCtrl =</span> <span class="fu">list</span>(<span class="at">maxfun =</span> <span class="fl">2e5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># `Difference` = (area of the larger disc / area of the smaller disc) - 1, signed: positive = left disc larger.</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Dividing by 0.1 rescales it, so the coefficient is per 10% extra area instead of per 100%.</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Area_Difference_10pct =</span> Difference <span class="sc">/</span> <span class="fl">0.1</span>,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Illusion_Strength_f =</span> <span class="fu">factor</span>(Illusion_Strength)  <span class="co"># categorical version</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">glmerControl</span>(<span class="at">optimizer =</span> <span class="st">"bobyqa"</span>, <span class="at">optCtrl =</span> <span class="fu">list</span>(<span class="at">maxfun =</span> <span class="fl">2e5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -1868,8 +1881,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>m_core <span class="ot">&lt;-</span> <span class="fu">glmer</span>(</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  ResponseRight <span class="sc">~</span> Difference_10pct <span class="sc">+</span> Illusion_Strength <span class="sc">+</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span> <span class="sc">+</span> Difference_10pct <span class="sc">+</span> Illusion_Strength <span class="sc">|</span> Participant),</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  ResponseRight <span class="sc">~</span> Area_Difference_10pct <span class="sc">+</span> Illusion_Strength <span class="sc">+</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span> <span class="sc">+</span> Area_Difference_10pct <span class="sc">+</span> Illusion_Strength <span class="sc">|</span> Participant),</span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df, <span class="at">family =</span> binomial, <span class="at">control =</span> ctrl</span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
@@ -1885,22 +1898,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-stdout">
 <pre><code># Fixed Effects
 
-Parameter         | Log-Odds |   SE |         95% CI |     z |      p
----------------------------------------------------------------------
-(Intercept)       |    -0.10 | 0.11 | [-0.33,  0.12] | -0.88 | 0.377 
-Difference 10pct  |    -1.17 | 0.14 | [-1.44, -0.89] | -8.24 | &lt; .001
-Illusion Strength |     0.42 | 0.20 | [ 0.02,  0.82] |  2.05 | 0.040 
+Parameter             | Log-Odds |   SE |         95% CI |     z |      p
+-------------------------------------------------------------------------
+(Intercept)           |    -0.10 | 0.11 | [-0.33,  0.12] | -0.88 | 0.377 
+Area Difference 10pct |    -1.17 | 0.14 | [-1.44, -0.89] | -8.24 | &lt; .001
+Illusion Strength     |     0.42 | 0.20 | [ 0.02,  0.82] |  2.05 | 0.040 
 
 # Random Effects
 
-Parameter                                             | Coefficient
--------------------------------------------------------------------
-SD (Intercept: Participant)                           |        0.41
-SD (Difference_10pct: Participant)                    |        0.51
-SD (Illusion_Strength: Participant)                   |        0.75
-Cor (Intercept~Difference_10pct: Participant)         |        0.19
-Cor (Intercept~Illusion_Strength: Participant)        |       -0.25
-Cor (Difference_10pct~Illusion_Strength: Participant) |        0.28</code></pre>
+Parameter                                                  | Coefficient
+------------------------------------------------------------------------
+SD (Intercept: Participant)                                |        0.41
+SD (Area_Difference_10pct: Participant)                    |        0.51
+SD (Illusion_Strength: Participant)                        |        0.75
+Cor (Intercept~Area_Difference_10pct: Participant)         |        0.19
+Cor (Intercept~Illusion_Strength: Participant)             |       -0.25
+Cor (Area_Difference_10pct~Illusion_Strength: Participant) |        0.28</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>
@@ -1924,8 +1937,8 @@ The model has a log- or logit-link. Consider using `exponentiate =
 <div class="cell-output cell-output-stdout">
 <pre><code>Data: df
 Models:
-m_null: ResponseRight ~ Difference_10pct + (1 + Difference_10pct + Illusion_Strength | Participant)
-m_core: ResponseRight ~ Difference_10pct + Illusion_Strength + (1 + Difference_10pct + Illusion_Strength | Participant)
+m_null: ResponseRight ~ Area_Difference_10pct + (1 + Area_Difference_10pct + Illusion_Strength | Participant)
+m_core: ResponseRight ~ Area_Difference_10pct + Illusion_Strength + (1 + Area_Difference_10pct + Illusion_Strength | Participant)
        npar    AIC    BIC  logLik -2*log(L) Chisq Df Pr(&gt;Chisq)  
 m_null    8 3249.0 3298.8 -1616.5    3233.0                      
 m_core    9 3247.3 3303.3 -1614.6    3229.3 3.718  1    0.05383 .
@@ -1950,16 +1963,16 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
   See ?lme4::convergence and ?lme4::troubleshooting. (and others)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                        2.5 %     97.5 %
-(Intercept)       -0.35468423  0.1184665
-Difference_10pct  -1.45758999 -0.9082146
-Illusion_Strength  0.04796233  0.8189996</code></pre>
+<pre><code>                            2.5 %     97.5 %
+(Intercept)           -0.35468423  0.1184665
+Area_Difference_10pct -1.45758999 -0.9082146
+Illusion_Strength      0.04796233  0.8189996</code></pre>
 </div>
 </div>
 </section>
 <section id="individual-differences" class="level3">
 <h3 class="anchored" data-anchor-id="individual-differences">Individual differences</h3>
-<p>Each point shows one participant’s estimated illusion effect from the mixed model (log-odds per unit of illusion strength). Positive values suggest a bias towards judging the red disc as smaller than the blue disc. Negative values suggest a bias in the opposite direction.</p>
+<p>Each point shows one participant’s estimated illusion effect from the mixed model (log-odds per unit of illusion strength). Positive values suggest a bias towards judging the red-leaning disc as smaller than the other disc. Negative values suggest a bias in the opposite direction.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1996,8 +2009,8 @@ Illusion_Strength  0.04796233  0.8189996</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Data: df
 Models:
-m_core: ResponseRight ~ Difference_10pct + Illusion_Strength + (1 + Difference_10pct + Illusion_Strength | Participant)
-m_cat: ResponseRight ~ Difference_10pct + (1 + Difference_10pct + Illusion_Strength | Participant) + Illusion_Strength_f
+m_core: ResponseRight ~ Area_Difference_10pct + Illusion_Strength + (1 + Area_Difference_10pct + Illusion_Strength | Participant)
+m_cat: ResponseRight ~ Area_Difference_10pct + (1 + Area_Difference_10pct + Illusion_Strength | Participant) + Illusion_Strength_f
        npar    AIC    BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
 m_core    9 3247.3 3303.3 -1614.6    3229.3                     
 m_cat    12 3253.2 3328.0 -1614.6    3229.2 0.0322  3     0.9985</code></pre>
@@ -2103,7 +2116,7 @@ m_cat    12 3253.2 3328.0 -1614.6    3229.2 0.0322  3     0.9985</code></pre>
 </section>
 <section id="illusion-effect-by-factor-level" class="level3">
 <h3 class="anchored" data-anchor-id="illusion-effect-by-factor-level">Illusion effect by factor level</h3>
-<p>The marginal effect of <code>Illusion_Strength</code> at each level of each factor, i.e.&nbsp;the change in the probability of a right-hand response per unit of illusion strength. Descriptive only - moderator tests above show whether levels differ.</p>
+<p>The marginal effect of <code>Illusion_Strength</code> at each level of each factor, i.e.&nbsp;the change in the probability of a right-arrow response per unit of illusion strength. Descriptive only - moderator tests above show whether levels differ.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2176,8 +2189,8 @@ Type of slope was dY/dX</code></pre>
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>m_bayes <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  ResponseRight <span class="sc">~</span> Difference_10pct <span class="sc">+</span> Illusion_Strength <span class="sc">+</span></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span> <span class="sc">+</span> Difference_10pct <span class="sc">+</span> Illusion_Strength <span class="sc">|</span> Participant),</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  ResponseRight <span class="sc">~</span> Area_Difference_10pct <span class="sc">+</span> Illusion_Strength <span class="sc">+</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span> <span class="sc">+</span> Area_Difference_10pct <span class="sc">+</span> Illusion_Strength <span class="sc">|</span> Participant),</span>
 <span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df, <span class="at">family =</span> <span class="fu">bernoulli</span>(),</span>
 <span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="at">class =</span> b),</span>
 <span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sd)),</span>
@@ -2194,11 +2207,11 @@ Type of slope was dY/dX</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Summary of Posterior Distribution
 
-Parameter         | Median |         95% CI |     pd |  Rhat | ESS (tail)
--------------------------------------------------------------------------
-(Intercept)       |  -0.10 | [-0.37,  0.19] | 77.15% | 1.004 |       1804
-Difference_10pct  |  -1.17 | [-1.51, -0.84] |   100% | 1.002 |       2046
-Illusion_Strength |   0.41 | [-0.08,  0.89] | 95.62% | 1.001 |       2004</code></pre>
+Parameter             | Median |         95% CI |     pd |  Rhat | ESS (tail)
+-----------------------------------------------------------------------------
+(Intercept)           |  -0.10 | [-0.37,  0.19] | 77.15% | 1.004 |       1804
+Area_Difference_10pct |  -1.17 | [-1.51, -0.84] |   100% | 1.002 |       2046
+Illusion_Strength     |   0.41 | [-0.08,  0.89] | 95.62% | 1.001 |       2004</code></pre>
 </div>
 </div>
 </section>

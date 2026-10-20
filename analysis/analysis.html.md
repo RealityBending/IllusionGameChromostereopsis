@@ -99,13 +99,13 @@ df <- map(files, read_session) |>
   list_rbind() |>
   mutate(
     Participant = paste0("P", str_pad(match(participant_id, unique(participant_id)), 2, pad = "0")),
-      # The judged attribute. `Difference` is the signed area difference, positive = left
-      # disc is larger; its magnitude is task difficulty and its sign the correct answer.
+    # The judged attribute. `Difference` is the signed area difference, positive = left
+    # disc is larger; its magnitude is task difficulty and its sign the correct answer.
     Difference_Abs = abs(Difference),
     Difference_Side = if_else(Difference > 0, "Left", "Right"),
     # The illusion. The sign of `Illusion_Strength` says which panel holds the
-    # red-leaning disc (>= 0 is left), its magnitude the chromatic separation.
-    Red_Side = case_when(
+    # red-leaning disc (> 0 is left), its magnitude is the chromatic separation.
+    Red_Leaning_Side = case_when(
       Illusion_Strength > 0 ~ "Left",
       Illusion_Strength < 0 ~ "Right",
       .default = "None"  # both panels are the same purple
@@ -696,7 +696,7 @@ df |>
 
 #### Accuracy 
 
-Accuracy when the red disc is the truly larger or smaller one, against the baseline (both panels purple, no red/blue contrast):
+Accuracy when the red-leaning disc is actually larger or smaller than the other disc, against the baseline with no red/blue difference (illusion strength = 0):
 
 
 ::: {.cell}
@@ -704,65 +704,65 @@ Accuracy when the red disc is the truly larger or smaller one, against the basel
 ```{.r .cell-code}
 df |>
   mutate(
-    Red_Is = case_when(
-      Red_Side == "None"          ~ "Purple (no red/blue contrast)",
-      Red_Side == Difference_Side ~ "Red larger",
-      .default                    = "Red smaller"
+    Red_Leaning_Disc_Is = case_when(
+      Red_Leaning_Side == "None"          ~ "No red/blue difference (illusion strength = 0)",
+      Red_Leaning_Side == Difference_Side ~ "Red-leaning actually larger",
+      .default                            = "Red-leaning actually smaller"
     )
   ) |>
-  summarise(Trials = n(), Correct = mean(correct), .by = Red_Is) |>
+  summarise(Trials = n(), Correct = mean(correct), .by = Red_Leaning_Disc_Is) |>
   display()
 ```
 
 ::: {.cell-output-display}
 
 
-|Red_Is                        | Trials| Correct|
-|:-----------------------------|------:|-------:|
-|Purple (no red/blue contrast) |    750|    0.80|
-|Red smaller                   |   1483|    0.83|
-|Red larger                    |   1517|    0.74|
+|Red_Leaning_Disc_Is                            | Trials| Correct|
+|:----------------------------------------------|------:|-------:|
+|No red/blue difference (illusion strength = 0) |    750|    0.80|
+|Red-leaning actually smaller                   |   1483|    0.83|
+|Red-leaning actually larger                    |   1517|    0.74|
 
 
 :::
 :::
 
 
-Accuracy per participant (positive `Diff` means more accurate when red is smaller):
+Accuracy per participant (positive `Diff` means more accurate when the red-leaning disc is actually smaller):
 
 
 ::: {.cell}
 
 ```{.r .cell-code}
 df |>
-  filter(Red_Side != "None") |>
-  mutate(Red_Is = if_else(Red_Side == Difference_Side, "Larger", "Smaller")) |>
-  summarise(Correct = mean(correct), .by = c(Participant, Red_Is)) |>
-  pivot_wider(names_from = Red_Is, values_from = Correct, names_prefix = "Red_") |>
-  mutate(Diff = Red_Smaller - Red_Larger) |>
+  filter(Red_Leaning_Side != "None") |>
+  mutate(Red_Leaning_Disc_Is = if_else(Red_Leaning_Side == Difference_Side, "actually_larger", "actually_smaller")) |>
+  summarise(Correct = mean(correct), .by = c(Participant, Red_Leaning_Disc_Is)) |>
+  pivot_wider(names_from = Red_Leaning_Disc_Is, values_from = Correct, names_prefix = "Red_leaning_") |>
+  mutate(Diff = Red_leaning_actually_smaller - Red_leaning_actually_larger) |>
   display()
 ```
 
 ::: {.cell-output-display}
 
 
-|Participant | Red_Smaller| Red_Larger|  Diff|
-|:-----------|-----------:|----------:|-----:|
-|P02         |        0.77|       0.64|  0.13|
-|P03         |        0.77|       0.81| -0.04|
-|P04         |        0.81|       0.69|  0.12|
-|P06         |        0.94|       0.42|  0.52|
-|P07         |        0.88|       0.93| -0.05|
-|P08         |        0.80|       0.75|  0.05|
-|P09         |        0.88|       0.68|  0.20|
-|P10         |        0.71|       0.75| -0.05|
-|P11         |        0.87|       0.86|  0.02|
-|P12         |        0.82|       0.66|  0.16|
-|P13         |        0.84|       0.67|  0.18|
-|P14         |        0.92|       0.73|  0.19|
-|P15         |        0.87|       0.89| -0.02|
-|P16         |        0.86|       0.69|  0.17|
-|P17         |        0.68|       0.88| -0.20|
+|Participant | Red_leaning_actually_smaller| Red_leaning_actually_larger|  Diff|
+|:-----------|----------------------------:|---------------------------:|-----:|
+|P02         |                         0.77|                        0.64|  0.13|
+|P03         |                         0.77|                        0.81| -0.04|
+|P04         |                         0.81|                        0.69|  0.12|
+|P06         |                         0.94|                        0.42|  0.52|
+|P07         |                         0.88|                        0.93| -0.05|
+|P08         |                         0.80|                        0.75|  0.05|
+|P09         |                         0.88|                        0.68|  0.20|
+|P10         |                         0.71|                        0.75| -0.05|
+|P11         |                         0.87|                        0.86|  0.02|
+|P12         |                         0.82|                        0.66|  0.16|
+|P13         |                         0.84|                        0.67|  0.18|
+|P14         |                         0.92|                        0.73|  0.19|
+|P15         |                         0.87|                        0.89| -0.02|
+|P16         |                         0.86|                        0.69|  0.17|
+|P17         |                         0.68|                        0.88| -0.20|
 
 
 :::
@@ -771,7 +771,12 @@ df |>
 
 ## Mixed-effects models
 
-Logistic mixed models of the response (`ResponseRight`). A positive `Illusion_Strength` coefficient means the red disc is judged smaller. Random slopes model between-participant variation in sensitivity to area difference and illusion strength.
+Logistic mixed models of the probability of a right-arrow response (`ResponseRight`: `TRUE` = the participant said the right disc was larger, `FALSE` = the left disc). The two predictors are:
+
+- `Area_Difference_10pct`: the true area difference between the two discs, in units of 10% (positive = left disc larger, negative = right disc larger).
+- `Illusion_Strength`: from -1 to 1. The sign sets which side the red-leaning disc is on (positive = left, negative = right) and the magnitude the red/blue contrast. 0 = no red/blue difference.
+
+A positive `Illusion_Strength` coefficient means the red-leaning disc was judged smaller. Random slopes model between-participant variation in sensitivity to area difference and illusion strength.
 
 ### Preparation
 
@@ -781,7 +786,9 @@ Logistic mixed models of the response (`ResponseRight`). A positive `Illusion_St
 ```{.r .cell-code}
 df <- df |>
   mutate(
-    Difference_10pct = Difference / 0.1,             # area difference, in units of 10%
+    # `Difference` = (area of the larger disc / area of the smaller disc) - 1, signed: positive = left disc larger.
+    # Dividing by 0.1 rescales it, so the coefficient is per 10% extra area instead of per 100%.
+    Area_Difference_10pct = Difference / 0.1,
     Illusion_Strength_f = factor(Illusion_Strength)  # categorical version
   )
 
@@ -799,8 +806,8 @@ Singular-fit check: `FALSE` is fine. If `TRUE`, refit with uncorrelated random e
 
 ```{.r .cell-code}
 m_core <- glmer(
-  ResponseRight ~ Difference_10pct + Illusion_Strength +
-    (1 + Difference_10pct + Illusion_Strength | Participant),
+  ResponseRight ~ Area_Difference_10pct + Illusion_Strength +
+    (1 + Area_Difference_10pct + Illusion_Strength | Participant),
   data = df, family = binomial, control = ctrl
 )
 
@@ -825,22 +832,22 @@ parameters(m_core)
 ```
 # Fixed Effects
 
-Parameter         | Log-Odds |   SE |         95% CI |     z |      p
----------------------------------------------------------------------
-(Intercept)       |    -0.10 | 0.11 | [-0.33,  0.12] | -0.88 | 0.377 
-Difference 10pct  |    -1.17 | 0.14 | [-1.44, -0.89] | -8.24 | < .001
-Illusion Strength |     0.42 | 0.20 | [ 0.02,  0.82] |  2.05 | 0.040 
+Parameter             | Log-Odds |   SE |         95% CI |     z |      p
+-------------------------------------------------------------------------
+(Intercept)           |    -0.10 | 0.11 | [-0.33,  0.12] | -0.88 | 0.377 
+Area Difference 10pct |    -1.17 | 0.14 | [-1.44, -0.89] | -8.24 | < .001
+Illusion Strength     |     0.42 | 0.20 | [ 0.02,  0.82] |  2.05 | 0.040 
 
 # Random Effects
 
-Parameter                                             | Coefficient
--------------------------------------------------------------------
-SD (Intercept: Participant)                           |        0.41
-SD (Difference_10pct: Participant)                    |        0.51
-SD (Illusion_Strength: Participant)                   |        0.75
-Cor (Intercept~Difference_10pct: Participant)         |        0.19
-Cor (Intercept~Illusion_Strength: Participant)        |       -0.25
-Cor (Difference_10pct~Illusion_Strength: Participant) |        0.28
+Parameter                                                  | Coefficient
+------------------------------------------------------------------------
+SD (Intercept: Participant)                                |        0.41
+SD (Area_Difference_10pct: Participant)                    |        0.51
+SD (Illusion_Strength: Participant)                        |        0.75
+Cor (Intercept~Area_Difference_10pct: Participant)         |        0.19
+Cor (Intercept~Illusion_Strength: Participant)             |       -0.25
+Cor (Area_Difference_10pct~Illusion_Strength: Participant) |        0.28
 ```
 
 
@@ -887,8 +894,8 @@ anova(m_null, m_core)
 ```
 Data: df
 Models:
-m_null: ResponseRight ~ Difference_10pct + (1 + Difference_10pct + Illusion_Strength | Participant)
-m_core: ResponseRight ~ Difference_10pct + Illusion_Strength + (1 + Difference_10pct + Illusion_Strength | Participant)
+m_null: ResponseRight ~ Area_Difference_10pct + (1 + Area_Difference_10pct + Illusion_Strength | Participant)
+m_core: ResponseRight ~ Area_Difference_10pct + Illusion_Strength + (1 + Area_Difference_10pct + Illusion_Strength | Participant)
        npar    AIC    BIC  logLik -2*log(L) Chisq Df Pr(>Chisq)  
 m_null    8 3249.0 3298.8 -1616.5    3233.0                      
 m_core    9 3247.3 3303.3 -1614.6    3229.3 3.718  1    0.05383 .
@@ -935,10 +942,10 @@ Computing bootstrap confidence intervals ...
 ::: {.cell-output .cell-output-stdout}
 
 ```
-                        2.5 %     97.5 %
-(Intercept)       -0.35468423  0.1184665
-Difference_10pct  -1.45758999 -0.9082146
-Illusion_Strength  0.04796233  0.8189996
+                            2.5 %     97.5 %
+(Intercept)           -0.35468423  0.1184665
+Area_Difference_10pct -1.45758999 -0.9082146
+Illusion_Strength      0.04796233  0.8189996
 ```
 
 
@@ -948,7 +955,7 @@ Illusion_Strength  0.04796233  0.8189996
 
 ### Individual differences
 
-Each point shows one participant’s estimated illusion effect from the mixed model (log-odds per unit of illusion strength). Positive values suggest a bias towards judging the red disc as smaller than the blue disc. Negative values suggest a bias in the opposite direction.
+Each point shows one participant’s estimated illusion effect from the mixed model (log-odds per unit of illusion strength). Positive values suggest a bias towards judging the red-leaning disc as smaller than the other disc. Negative values suggest a bias in the opposite direction.
 
 
 ::: {.cell}
@@ -990,8 +997,8 @@ anova(m_core, m_cat)
 ```
 Data: df
 Models:
-m_core: ResponseRight ~ Difference_10pct + Illusion_Strength + (1 + Difference_10pct + Illusion_Strength | Participant)
-m_cat: ResponseRight ~ Difference_10pct + (1 + Difference_10pct + Illusion_Strength | Participant) + Illusion_Strength_f
+m_core: ResponseRight ~ Area_Difference_10pct + Illusion_Strength + (1 + Area_Difference_10pct + Illusion_Strength | Participant)
+m_cat: ResponseRight ~ Area_Difference_10pct + (1 + Area_Difference_10pct + Illusion_Strength | Participant) + Illusion_Strength_f
        npar    AIC    BIC  logLik -2*log(L)  Chisq Df Pr(>Chisq)
 m_core    9 3247.3 3303.3 -1614.6    3229.3                     
 m_cat    12 3253.2 3328.0 -1614.6    3229.2 0.0322  3     0.9985
@@ -1049,7 +1056,7 @@ display(moderators)
 
 ### Illusion effect by factor level
 
-The marginal effect of `Illusion_Strength` at each level of each factor, i.e. the change in the probability of a right-hand response per unit of illusion strength. Descriptive only - moderator tests above show whether levels differ.
+The marginal effect of `Illusion_Strength` at each level of each factor, i.e. the change in the probability of a right-arrow response per unit of illusion strength. Descriptive only - moderator tests above show whether levels differ.
 
 
 ::: {.cell}
@@ -1133,8 +1140,8 @@ Bayesian version of the core model, with weakly informative priors (wide normal 
 
 ```{.r .cell-code}
 m_bayes <- brm(
-  ResponseRight ~ Difference_10pct + Illusion_Strength +
-    (1 + Difference_10pct + Illusion_Strength | Participant),
+  ResponseRight ~ Area_Difference_10pct + Illusion_Strength +
+    (1 + Area_Difference_10pct + Illusion_Strength | Participant),
   data = df, family = bernoulli(),
   prior = c(prior(normal(0, 2), class = b),
             prior(exponential(1), class = sd)),
@@ -1157,14 +1164,13 @@ describe_posterior(m_bayes, test = "pd")
 ```
 Summary of Posterior Distribution
 
-Parameter         | Median |         95% CI |     pd |  Rhat | ESS (tail)
--------------------------------------------------------------------------
-(Intercept)       |  -0.10 | [-0.37,  0.19] | 77.15% | 1.004 |       1804
-Difference_10pct  |  -1.17 | [-1.51, -0.84] |   100% | 1.002 |       2046
-Illusion_Strength |   0.41 | [-0.08,  0.89] | 95.62% | 1.001 |       2004
+Parameter             | Median |         95% CI |     pd |  Rhat | ESS (tail)
+-----------------------------------------------------------------------------
+(Intercept)           |  -0.10 | [-0.37,  0.19] | 77.15% | 1.004 |       1804
+Area_Difference_10pct |  -1.17 | [-1.51, -0.84] |   100% | 1.002 |       2046
+Illusion_Strength     |   0.41 | [-0.08,  0.89] | 95.62% | 1.001 |       2004
 ```
 
 
 :::
 :::
-

@@ -95,8 +95,8 @@ df <- map(files, read_session) |>
     Difference_Abs = abs(Difference),
     Difference_Side = if_else(Difference > 0, "Left", "Right"),
     # The illusion. The sign of `Illusion_Strength` says which panel holds the
-    # red-leaning disc (>= 0 is left), its magnitude the chromatic separation.
-    Red_Side = case_when(
+    # red-leaning disc (> 0 is left), its magnitude is the chromatic separation.
+    Red_Leaning_Side = case_when(
       Illusion_Strength > 0 ~ "Left",
       Illusion_Strength < 0 ~ "Right",
       .default = "None"  # both panels are the same purple
@@ -407,43 +407,50 @@ df |>
 
 #### Accuracy 
 
-Accuracy when the red disc is the truly larger or smaller one, against the baseline (both panels purple, no red/blue contrast):
+Accuracy when the red-leaning disc is actually larger or smaller than the other disc, against the baseline with no red/blue difference (illusion strength = 0):
 
 ```{r}
 df |>
   mutate(
-    Red_Is = case_when(
-      Red_Side == "None"          ~ "Purple (no red/blue contrast)",
-      Red_Side == Difference_Side ~ "Red larger",
-      .default                    = "Red smaller"
+    Red_Leaning_Disc_Is = case_when(
+      Red_Leaning_Side == "None"          ~ "No red/blue difference (illusion strength = 0)",
+      Red_Leaning_Side == Difference_Side ~ "Red-leaning actually larger",
+      .default                            = "Red-leaning actually smaller"
     )
   ) |>
-  summarise(Trials = n(), Correct = mean(correct), .by = Red_Is) |>
+  summarise(Trials = n(), Correct = mean(correct), .by = Red_Leaning_Disc_Is) |>
   display()
 ```
 
-Accuracy per participant (positive `Diff` means more accurate when red is smaller):
+Accuracy per participant (positive `Diff` means more accurate when the red-leaning disc is actually smaller):
 
 ```{r}
 df |>
-  filter(Red_Side != "None") |>
-  mutate(Red_Is = if_else(Red_Side == Difference_Side, "Larger", "Smaller")) |>
-  summarise(Correct = mean(correct), .by = c(Participant, Red_Is)) |>
-  pivot_wider(names_from = Red_Is, values_from = Correct, names_prefix = "Red_") |>
-  mutate(Diff = Red_Smaller - Red_Larger) |>
+  filter(Red_Leaning_Side != "None") |>
+  mutate(Red_Leaning_Disc_Is = if_else(Red_Leaning_Side == Difference_Side, "actually_larger", "actually_smaller")) |>
+  summarise(Correct = mean(correct), .by = c(Participant, Red_Leaning_Disc_Is)) |>
+  pivot_wider(names_from = Red_Leaning_Disc_Is, values_from = Correct, names_prefix = "Red_leaning_") |>
+  mutate(Diff = Red_leaning_actually_smaller - Red_leaning_actually_larger) |>
   display()
 ```
 
 ## Mixed-effects models
 
-Logistic mixed models of the response (`ResponseRight`). A positive `Illusion_Strength` coefficient means the red disc is judged smaller. Random slopes model between-participant variation in sensitivity to area difference and illusion strength.
+Logistic mixed models of the probability of a right-arrow response (`ResponseRight`: `TRUE` = the participant said the right disc was larger, `FALSE` = the left disc). The two predictors are:
+
+- `Area_Difference_10pct`: the true area difference between the two discs, in units of 10% (positive = left disc larger, negative = right disc larger).
+- `Illusion_Strength`: from -1 to 1. The sign sets which side the red-leaning disc is on (positive = left, negative = right) and the magnitude the red/blue contrast. 0 = no red/blue difference.
+
+A positive `Illusion_Strength` coefficient means the red-leaning disc was judged smaller. Random slopes model between-participant variation in sensitivity to area difference and illusion strength.
 
 ### Preparation
 
 ```{r}
 df <- df |>
   mutate(
-    Difference_10pct = Difference / 0.1,             # area difference, in units of 10%
+    # `Difference` = (area of the larger disc / area of the smaller disc) - 1, signed: positive = left disc larger.
+    # Dividing by 0.1 rescales it, so the coefficient is per 10% extra area instead of per 100%.
+    Area_Difference_10pct = Difference / 0.1,
     Illusion_Strength_f = factor(Illusion_Strength)  # categorical version
   )
 
@@ -456,8 +463,8 @@ Singular-fit check: `FALSE` is fine. If `TRUE`, refit with uncorrelated random e
 
 ```{r}
 m_core <- glmer(
-  ResponseRight ~ Difference_10pct + Illusion_Strength +
-    (1 + Difference_10pct + Illusion_Strength | Participant),
+  ResponseRight ~ Area_Difference_10pct + Illusion_Strength +
+    (1 + Area_Difference_10pct + Illusion_Strength | Participant),
   data = df, family = binomial, control = ctrl
 )
 
@@ -481,9 +488,11 @@ set.seed(123)
 confint(m_core, method = "boot", nsim = 500, parm = "beta_")
 ```
 
+Singular-fit and convergence warnings can occur in bootstrap refits when there are few participants. Ideally, they should be infrequent relative to the total number of simulations, and the resulting intervals should be treated as approximate.
+
 ### Individual differences
 
-Each point shows one participant’s estimated illusion effect from the mixed model (log-odds per unit of illusion strength). Positive values suggest a bias towards judging the red disc as smaller than the blue disc. Negative values suggest a bias in the opposite direction.
+Each point shows one participant’s estimated illusion effect from the mixed model (log-odds per unit of illusion strength). Positive values suggest a bias towards judging the red-leaning disc as smaller than the other disc. Negative values suggest a bias in the opposite direction.
 
 ```{r}
 ind <- coef(m_core)$Participant |>
@@ -536,7 +545,7 @@ display(moderators)
 
 ### Illusion effect by factor level
 
-The marginal effect of `Illusion_Strength` at each level of each factor, i.e. the change in the probability of a right-hand response per unit of illusion strength. Descriptive only - moderator tests above show whether levels differ.
+The marginal effect of `Illusion_Strength` at each level of each factor, i.e. the change in the probability of a right-arrow response per unit of illusion strength. Descriptive only - moderator tests above show whether levels differ.
 
 ```{r}
 for (f in factors) {
@@ -553,8 +562,8 @@ Bayesian version of the core model, with weakly informative priors (wide normal 
 #| output: false
 
 m_bayes <- brm(
-  ResponseRight ~ Difference_10pct + Illusion_Strength +
-    (1 + Difference_10pct + Illusion_Strength | Participant),
+  ResponseRight ~ Area_Difference_10pct + Illusion_Strength +
+    (1 + Area_Difference_10pct + Illusion_Strength | Participant),
   data = df, family = bernoulli(),
   prior = c(prior(normal(0, 2), class = b),
             prior(exponential(1), class = sd)),
