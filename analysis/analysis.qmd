@@ -384,10 +384,10 @@ arrange(rez, p)
 ```{r}
 #| warning: false
 
-m <- glm(Error ~ Difference_Abs,
+m <- glmer(Error ~ as.factor(Difference_Abs) + (1|participant_id),
          data = df, family = "binomial")
 
-estimate_prediction(m, by = "Difference_Abs") |> 
+estimate_expectation(m, by = "Difference_Abs") |> 
   plot()
 ```
 
