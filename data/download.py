@@ -1,16 +1,19 @@
 """
-data/download.py — the sessions, off Zenodo and into data/raw/.
+data/download.py — the sessions, off Zenodo and into data/pilotN/raw/.
 
 Adapted from TestYourself's `data/collected/download.py`. The experiment sends every session
-through DataPipe into a Zenodo deposit (see "Saving" in `experiment/README.md`); this fetches
-what is in that deposit, checks each file against its checksum and puts it in `data/raw/`,
-which is git-ignored: it holds participant data, and this repository is public.
+through DataPipe into a Zenodo deposit, one deposit per pilot (see "Saving" in
+`experiment/pilotN/README.md`); this fetches what is in a pilot's deposit, checks each file
+against its checksum and puts it in `data/pilotN/raw/`, which is git-ignored: it holds
+participant data, and this repository is public.
 
-    python data/download.py               # fetch what is new, verify, report
-    python data/download.py --skip-test   # leave the test runs on Zenodo
-    python data/download.py --list        # say what is there, download nothing
+    python data/download.py --pilot 1     # fetch what is new, verify, report
+    python data/download.py --pilot 1 --skip-test   # leave the test runs on Zenodo
+    python data/download.py --pilot 1 --list        # say what is there, download nothing
 
-Standard library only, and safe to run again: a file already in `data/raw/` with the right
+Without `--pilot`, the latest pilot that has a deposit is used.
+
+Standard library only, and safe to run again: a file already in `raw/` with the right
 size and checksum is left alone, so it can be rerun to pull an ongoing study down.
 
 **The token.** While DataPipe is collecting, the deposit is an unpublished **draft** (DataPipe
@@ -35,7 +38,7 @@ narrowest that can read a draft; it can also write, so rotate it when the study 
 A partial is a bare JSON array of the records staged during the session: one `"record":
 "frame"` (session, demographics, design) followed by one `"record": "trial"` per trial.
 Past 80 files in a deposit, DataPipe packs the older ones into `datapipe-batch-NNNN.zip`;
-those are unpacked here as they arrive, so `data/raw/` always holds sessions, not archives.
+those are unpacked here as they arrive, so `raw/` always holds sessions, not archives.
 
 **The report** counts finished sessions apart from partials and test runs, and names any session
 that has *both* a complete file and a partial. That means the session was not closed as
@@ -56,9 +59,9 @@ import zipfile
 from pathlib import Path
 
 ZENODO = "https://zenodo.org/api"
-DEPOSIT = 22944626  # IllusionGameChromostereopsis, the deposit DataPipe writes into
+# The Zenodo deposit DataPipe writes each pilot into (one per pilot; add the next pilot's here)
+DEPOSITS = {1: 22944626}
 HERE = Path(__file__).resolve().parent
-RAW = HERE / "raw"
 
 CHUNK = 1 << 16  # bytes a download is read in, so a big archive never lands in memory whole
 
@@ -316,12 +319,19 @@ def report(names):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Download the sessions from Zenodo into data/raw/.")
-    parser.add_argument("--deposit", type=int, default=DEPOSIT, help="Zenodo deposit id (default: this study's)")
+    parser = argparse.ArgumentParser(description="Download a pilot's sessions from Zenodo into data/pilotN/raw/.")
+    latest = max(n for n, d in DEPOSITS.items() if d)
+    parser.add_argument("--pilot", type=int, choices=sorted(DEPOSITS), default=latest,
+                        help="which pilot (default: %d, the latest with a deposit)" % latest)
+    parser.add_argument("--deposit", type=int, help="Zenodo deposit id (default: the pilot's)")
     parser.add_argument("--list", action="store_true", help="say what is in the deposit and download nothing")
     parser.add_argument("--skip-test", action="store_true", help="leave the test runs on Zenodo")
-    parser.add_argument("--into", type=Path, default=RAW, help="where to put them (default: data/raw)")
+    parser.add_argument("--into", type=Path, help="where to put them (default: data/pilotN/raw)")
     args = parser.parse_args()
+    args.deposit = args.deposit or DEPOSITS[args.pilot]
+    if not args.deposit:
+        sys.exit("Pilot %d has no Zenodo deposit yet: set it in DEPOSITS, or pass --deposit." % args.pilot)
+    args.into = args.into or HERE / ("pilot%d" % args.pilot) / "raw"
 
     held = token()
     kind, body = deposit(args.deposit, held)

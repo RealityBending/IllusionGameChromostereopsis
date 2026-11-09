@@ -2,38 +2,45 @@
 
 ## Aim
 
-Chromostereopsis is the illusion that, on a **flat** image, saturated red appears nearer
-than saturated blue on a black field (most observers; a minority see the reverse, and
-10-20% see no depth at all). It is a *binocular* effect, driven mostly by longitudinal and
-transverse chromatic aberration combined with the temporal offset of the fovea, plus a
-plain brightness cue (red is emitted about 3x brighter than blue in sRGB).
+Chromostereopsis is the perception of depth between colours on a flat image. With saturated red
+and blue on black, most observers report red as nearer; a minority report the reverse, and roughly
+10-20% no depth. It is thought to be mainly binocular, driven by chromatic aberration and the
+offset of the fovea from the optical axis, with brightness as an extra cue (red is about 3x
+brighter than blue in sRGB).
 
-The problem for an Illusion-Game-style task is that depth on a flat image has **no ground
-truth**, so there is nothing to be right or wrong about. This study asks whether that can
-be fixed by moving the judged attribute from depth to **size**:
+Depth on a flat image has no ground truth, but size does, so this study measures size judgements:
 
-> Does chromostereopsis bias size judgements, and if so, in which direction and under which
-> stimulus conditions?
+> **Primary:** does the perceived depth from chromostereopsis carry over into size judgements and,
+> if so, in which direction?
+>
+> **Secondary:** develop an online method for measuring the effect of chromostereopsis on size
+> judgements.
 
-Two accounts predict **opposite** signs, which is what makes the question informative
-rather than confirmatory:
+Two accounts predict **opposite** directions:
 
-- **Size constancy** — a disc that appears *nearer* at the same retinal size should appear
+- **Size constancy**: a disc that appears *nearer* at the same retinal size should appear
   *smaller*, so the red disc should be judged smaller.
-- **Irradiation** — the *brighter* shape looks larger, so the red disc should be judged
-  larger. (This is the sign the anecdotal pixel-art reports suggest.)
+- **Irradiation**: the *brighter* shape looks larger, so the red disc should be judged larger.
 
-If neither holds, the design collapses back to a pure depth judgement with no ground truth
-and the illusion cannot be used in the Illusion Game paradigm. So the honest framing of
-this study is **viability screening**, not effect estimation.
+The study is screening, not effect estimation, and does not assess Illusion Game suitability (see
+**Limitation: optics vs perception**).
 
 ## The three pieces
 
 | Where | What |
 | ----- | ---- |
 | `Pyllusion/pyllusion/Chromostereopsis/` | The stimulus. `Chromostereopsis.py` holds the literature review, the mechanisms, the candidate design and the open questions; `chromostereopsis_parameters.py` computes the parameter dictionary; `chromostereopsis_image.py` renders it. Still a **prototype**, not in the public API. |
-| `experiment/` (this repo) | The pilot experiment: dependency-free HTML/JS, `stimulus.js` being a port of the Pyllusion parameter and image functions (so a trial can be re-rendered from its recorded `Seed`). `design.js` holds `DESIGN` and builds the trial list. See its `README.md`. Served by GitHub Pages at <https://realitybendinglab.com/IllusionGameChromostereopsis/experiment/>, so anything pushed to `main` is live. |
-| this repo | The data (`data/pilots/`) and the analysis (`analysis/`). |
+| `experiment/pilotN/` (this repo) | One pilot's experiment: dependency-free HTML/JS, `stimulus.js` being a port of the Pyllusion parameter and image functions (so a trial can be re-rendered from its recorded `Seed`). `design.js` holds `DESIGN` and builds the trial list. See its `README.md`. Served by GitHub Pages at `https://realitybendinglab.com/IllusionGameChromostereopsis/experiment/pilotN/`, so anything pushed to `main` is live; `experiment/index.html` is only a landing page linking to the pilots. |
+| this repo | The data (`data/pilotN/`) and the analysis (`analysis/pilotN/`). |
+
+### One folder per pilot
+
+`experiment/pilotN/`, `data/pilotN/{manual,raw}/`, `analysis/pilotN/`.
+
+- Each pilot's task is a full copy, not shared code: a trial only re-renders from its `Seed` with
+  the code that drew it. **Never edit a finished pilot's code** (pilot 1 = git tag `pilot1`).
+- Each pilot has its own DataPipe experiment and Zenodo deposit (`DATAPIPE_EXPERIMENT`,
+  `DEPOSITS` in `data/download.py`).
 
 ## The task
 
@@ -56,7 +63,7 @@ any stage. It shows up as an asymmetry of error rates (and RTs) between the two 
   means the same thing across all three: the smaller disc stays at `size` and the larger is
   scaled by `sqrt(1 + |difference|)`. So it is a difference in *area*, not diameter
   (`difference = 1` is twice the area, i.e. 1.41x the diameter). **Positive puts the larger
-  disc on the left.** Levels: 0.1, 0.25, 0.5, 1.0, sign balanced. Never zero, so every trial
+  disc on the left.** Levels (pilot 1): 0.025, 0.05, 0.1, 0.25, 0.5, sign balanced. Never zero, so every trial
   has a correct answer — this is task difficulty.
 - **`illusion_strength`** — how far apart each disc and its surround sit on the red-blue
   axis, from -1 to 1. At ±1 the discs are the pure colours; as the magnitude falls, discs
@@ -77,7 +84,7 @@ any stage. It shows up as an asymmetry of error rates (and RTs) between the two 
 These are the "which conditions, if any, make it work" factors, each taken from something
 the literature reports as modulating chromostereopsis. They are **not** crossed with the
 grid above (3x3x3x3x2x2 x the grid x repetitions is well over 20,000 trials). Instead each
-is assigned within every set of 20 trials by **balanced randomisation**: every level appears
+is assigned within every set of 25 trials by **balanced randomisation**: every level appears
 equally often up to rounding, orders shuffled independently, so the factors are orthogonal
 to the grid and to each other in expectation. Continuous factors get three levels so that a
 monotonic effect can be distinguished from a non-monotonic one.
@@ -136,23 +143,38 @@ thing; the JSON is what is kept, since it is the lossless version.
 
 Sessions reach this repo two ways:
 
-- **Zenodo, through DataPipe** (the normal route; experiment `Xykm83c1D95D`, deposit
-  `zenodo.org/uploads/22944626`). The task streams one record per trial into a DataPipe session
-  and sends the whole container at the end, as
+- **Zenodo, through DataPipe** (the normal route; pilot 1: experiment `Xykm83c1D95D`, deposit
+  `zenodo.org/uploads/22944626`). The task streams one record per trial
+  into a DataPipe session and sends the whole container at the end, as
   `[test_]chromostereopsis_<start, UTC>_<participant_id>.json`; someone who stops partway
   leaves a `<name>-<id>.partial.json` (a bare array of `frame` and `trial` records) instead.
-  `data/download.py` (adapted from TestYourself's, standard library only) pulls the deposit
-  into `data/raw/`, which is **git-ignored**: this repo is public and served by GitHub Pages,
-  so participant data must never be committed. Details in `experiment/README.md` > Saving.
-  The client is vendored at `experiment/vendor/datapipe-client.js` (0.2.0, hash in that
-  README); do not swap it for a CDN tag.
-- **By hand**: files downloaded from the end screen go in `data/pilots/`.
+  `data/download.py --pilot N` (adapted from TestYourself's, standard library only) pulls that
+  pilot's deposit into `data/pilotN/raw/`, which is **git-ignored** (`data/*/raw/`): this repo is
+  public and served by GitHub Pages, so participant data must never be committed. Details in
+  `experiment/pilotN/README.md` > Saving. The client is vendored at
+  `experiment/pilotN/vendor/datapipe-client.js` (0.2.0, hash in that README); do not swap it for a
+  CDN tag.
+- **By hand**: files downloaded from the end screen go in `data/pilotN/manual/`.
 
-`analysis/analysis.qmd` reads every JSON in both folders — skipping `test_` runs and
-`.partial.json` files — and flattens them into one tidy trial-level dataframe. R, tidyverse +
+`analysis/pilotN/analysis.qmd` reads every JSON in that pilot's two folders — skipping `test_` runs
+and `.partial.json` files — and flattens them into one tidy trial-level dataframe. R, tidyverse +
 easystats, as in the other Illusion Game repos.
+
+## Limitation: optics vs perception
+
+Chromostereopsis appears to depend largely on each observer's optics (chromatic aberration, pupil
+position), which vary in strength and direction between people. Any effect on size judgements may
+therefore combine an optical stage (the depth signal) and a perceptual stage (depth feeding into
+size).
+
+**This study can** measure the combined effect online, its direction, and whether it scales with
+`illusion_strength`, and estimate each observer's direction so that opposite effects are not
+averaged out.
+
+**This study cannot** measure the eye's optics, separate the optical stage from the perceptual one,
+or measure the perceptual stage on its own. These would likely need a lab study with optical
+measures (e.g. vernier alignment for chromatic aberration).
 
 ## Status
 
-The data currently in `data/pilots/` is **the author's own session**, run as a first check
-that the task works end to end. It is not a sample. Treat any effect in it as a smoke test.
+- **Pilot 1** is finished: 15 participants, written up in `analysis/pilot1/pilot_analysis.pdf`.

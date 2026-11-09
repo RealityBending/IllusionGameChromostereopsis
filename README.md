@@ -1,41 +1,36 @@
 # IllusionGameChromostereopsis
 
-Can the chromostereopsis illusion (saturated red looking nearer than blue on a flat image) be
-turned into an Illusion Game task, by having participants judge **size** rather than depth?
-This repo holds the pilot experiment, its data and its analysis. The study is a **viability
-screening**: it asks whether chromostereopsis biases size judgements at all, in which
-direction, and under which stimulus conditions.
+Chromostereopsis is the perception of depth between colours on a flat surface. For example, with
+red and blue on black, most observers report red as nearer, although some report the reverse and
+some no depth.
 
-## Try the experiment
+**Primary aim:** does the perceived depth from chromostereopsis carry over into **size** judgements
+and, if so, in which direction?
 
-**<https://realitybendinglab.com/IllusionGameChromostereopsis/experiment/>**
+**Secondary aim:** develop an online method for measuring the effect of chromostereopsis on size
+judgements.
 
-It runs in the browser, with the arrow keys (or by tapping the left or right half of the screen
-on a touch device). Each session is saved to the project's
-[Zenodo deposit](https://zenodo.org/uploads/22944626) through [DataPipe](https://pipe.jspsych.org),
-trial by trial as it runs and as one file at the end, and can also be downloaded from the end screen.
-To try it without your run counting as data, add `?test` to the URL
-(<https://realitybendinglab.com/IllusionGameChromostereopsis/experiment/?test>): the file is then
-saved with a `test_` prefix. A run opened locally (`experiment/index.html`, no server needed) is
-treated as a test too.
+**Limitation:** chromostereopsis depends partly on each observer's eye optics, so any effect on size
+judgements likely combines optics and perception. This study cannot separate the two; that would
+likely need a lab study. Details and design rationale: [`AGENTS.md`](AGENTS.md#limitation-optics-vs-perception).
 
-## Contents
+## Pilots
 
-| Folder | What |
-| ------ | ---- |
-| [`experiment/`](experiment/) | The pilot task: dependency-free HTML/JS, served by GitHub Pages at the link above. `stimulus.js` ports the Pyllusion parameter and image functions, and `design.js` holds `DESIGN` and builds the trial list. See [`experiment/README.md`](experiment/README.md) for the task, the design and the data format. |
-| [`data/pilots/`](data/pilots/) | Sessions downloaded by hand from the task's end screen, one JSON file each. |
-| [`data/download.py`](data/download.py) | Fetches the sessions DataPipe saved to Zenodo into `data/raw/`, which is git-ignored (participant data, public repo). Needs a Zenodo token while the deposit is a draft; see the script's header. `python data/download.py` |
-| [`analysis/`](analysis/) | `analysis.qmd` reads every session file in `data/pilots/` and `data/raw/` (except test runs and partials) and flattens them into one trial-level dataframe (R, tidyverse + easystats). |
+| Pilot | Task | Status |
+| ----- | ---- | ------ |
+| 1 | [experiment/pilot1/](https://realitybendinglab.com/IllusionGameChromostereopsis/experiment/pilot1/) | Done, n = 15. [Write-up](analysis/pilot1/pilot_analysis.pdf). Frozen (git tag `pilot1`). |
 
-The stimulus itself is developed in
-[Pyllusion](https://github.com/RealityBending/Pyllusion) (`pyllusion/Chromostereopsis/`), as a
-prototype that is not yet in the public API.
+Add `?test` to a URL to try it without counting as data.
 
-[`AGENTS.md`](AGENTS.md) has the full rationale: the two competing predictions (size constancy vs
-irradiation), each parameter, the brightness confound, and what is recorded but not controlled.
+## Layout
 
-## Status
+```
+experiment/pilotN/   the task (HTML/JS), frozen once run; its README covers design, data, saving
+data/pilotN/manual/  sessions downloaded from the end screen
+data/pilotN/raw/     sessions from Zenodo (git-ignored): python data/download.py --pilot N
+analysis/pilotN/     analysis.qmd (R)
+```
 
-The data currently in `data/pilots/` is the author's own session, run as a first end-to-end check
-of the task. It is not a sample.
+**New pilot:** tag the current commit, copy the previous `experiment/pilotN/`, give it a new
+DataPipe experiment (`DATAPIPE_EXPERIMENT` in `experiment.js`, `DEPOSITS` in `data/download.py`),
+then add `data/` and `analysis/` folders.

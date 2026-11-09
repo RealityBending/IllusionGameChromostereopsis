@@ -1,5 +1,5 @@
 ---
-title: "Chromostereopsis Pilot - Analysis"
+title: "Chromostereopsis Pilot 1 - Analysis"
 editor: source
 editor_options:
   chunk_output_type: console
@@ -29,20 +29,20 @@ library(brms)
 
 ## Data
 
-Each session of the task (`experiment/`) is saved as one JSON container with `session`,
+Each session of the task (`experiment/pilot1/`) is saved as one JSON container with `session`,
 `demographics`, `design` and `trials`. Every trial carries the full Pyllusion parameter
 dictionary it was rendered from, so the design does not have to be reconstructed here - it is
 read off the trials.
 
-Sessions come from two places: `data/pilots/` (files downloaded from the task's end screen, in
-the repo) and `data/raw/` (sessions saved to Zenodo through DataPipe, fetched by
+Sessions come from two places: `data/pilot1/manual/` (files downloaded from the task's end screen, in
+the repo) and `data/pilot1/raw/` (sessions saved to Zenodo through DataPipe, fetched by
 `data/download.py`, git-ignored). Test runs (`test_...`) and the partial files of people who
 stopped partway (`....partial.json`, a different format) are left out.
 
 ```{r}
 #| code-fold: false
 
-path <- c("../data/pilots", "../data/raw")
+path <- c("../../data/pilot1/manual", "../../data/pilot1/raw")
 ```
 
 ### Reading one session
