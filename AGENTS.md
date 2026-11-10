@@ -63,7 +63,7 @@ any stage. It shows up as an asymmetry of error rates (and RTs) between the two 
   means the same thing across all three: the smaller disc stays at `size` and the larger is
   scaled by `sqrt(1 + |difference|)`. So it is a difference in *area*, not diameter
   (`difference = 1` is twice the area, i.e. 1.41x the diameter). **Positive puts the larger
-  disc on the left.** Levels (pilot 1): 0.025, 0.05, 0.1, 0.25, 0.5, sign balanced. Never zero, so every trial
+  disc on the left.** Levels: 0.025, 0.05, 0.1, 0.25, 0.5 in pilot 1, plus 0.01 in pilot 2, sign balanced. Never zero, so every trial
   has a correct answer — this is task difficulty.
 - **`illusion_strength`** — how far apart each disc and its surround sit on the red-blue
   axis, from -1 to 1. At ±1 the discs are the pure colours; as the magnitude falls, discs
@@ -71,7 +71,7 @@ any stage. It shows up as an asymmetry of error rates (and RTs) between the two 
   is that same purple and the two panels are chromatically identical — which gives each
   participant's own baseline left/right bias, exactly like Delboeuf's zero point. **The sign
   sets which panel gets the red-leaning disc** (>= 0 puts it on the left). Levels: -1, -0.5,
-  0, 0.5, 1.
+  0, 0.5, 1 in pilot 1; thirds (-1, -0.67, -0.33, 0, 0.33, 0.67, 1) in pilot 2.
 
   Mixing is done in **linear light**, not in 8-bit code values, so the mixes behave like
   physical mixtures of the two lights. Two consequences: `equiluminant=True` stays exact at
@@ -79,7 +79,11 @@ any stage. It shows up as an asymmetry of error rates (and RTs) between the two 
   retinal images are the red and blue images superimposed at reduced weight — the optical
   disparity signal is itself interpolated rather than switched off.
 
-### The stimulus factors the pilot screens
+### The stimulus factors screened
+
+The table below is **pilot 1's** design, which screened all six factors. Pilot 2 fixes all of them
+but `density`, and crosses that with a new `outline` (below). Each pilot's levels:
+`experiment/pilotN/README.md`, compared side by side in `README.md`.
 
 These are the "which conditions, if any, make it work" factors, each taken from something
 the literature reports as modulating chromostereopsis. They are **not** crossed with the
@@ -104,8 +108,14 @@ chromostereopsis; note that on black every colour has a Michelson contrast of 1,
 `luminance2=1`, `dither_shared=true` (both panels get the same dither pattern, so colour
 assignment is the only difference between them). One random `seed` per trial, logged.
 
-**Excluded combination**: `illusion_strength = 0` with `gap = 0` — same colour, no outline,
-the disc is invisible. Offending trials are repaired by *swapping* a factor level with
+**`outline`** (pilot 2, not in Pyllusion): a solid ring of the disc's own colour just inside its
+edge, in pixels (0 = none). It keeps the disc's edge, and so its size, defined when the disc is
+sparsely dithered. It is invisible on a solid disc, so it only matters below `density = 1`; pilot 2
+fully crosses the two (0 and 4 px x density 0.1, 0.5, 1).
+
+**Excluded combination**: `illusion_strength = 0` with `gap = 0` in pilot 1, and with
+`density = 0.1` and `outline = 0` in pilot 2 — same colour and no visible edge, so the disc is
+invisible. Offending trials are repaired by *swapping* a factor level with
 another trial, which preserves every factor's marginal balance.
 
 ### The brightness confound, which is the thing to watch
@@ -154,7 +164,7 @@ Sessions reach this repo two ways:
   `experiment/pilotN/README.md` > Saving. The client is vendored at
   `experiment/pilotN/vendor/datapipe-client.js` (0.2.0, hash in that README); do not swap it for a
   CDN tag.
-- **By hand**: files downloaded from the end screen go in `data/pilotN/manual/`.
+- **By hand**: files downloaded from the end screen go in `data/pilotN/manual/` (only pilot 1 has one so far).
 
 `analysis/pilotN/analysis.qmd` reads every JSON in that pilot's two folders — skipping `test_` runs
 and `.partial.json` files — and flattens them into one tidy trial-level dataframe. R, tidyverse +
@@ -178,3 +188,5 @@ measures (e.g. vernier alignment for chromatic aberration).
 ## Status
 
 - **Pilot 1** is finished: 15 participants, written up in `analysis/pilot1/pilot_analysis.pdf`.
+- **Pilot 2** is in design: changes listed in `experiment/pilot2/README.md`; check stimuli with
+  `experiment/pilot2/stimuli.html`. No DataPipe experiment yet (`DATAPIPE_EXPERIMENT = ""`).

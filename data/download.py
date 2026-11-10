@@ -60,7 +60,7 @@ from pathlib import Path
 
 ZENODO = "https://zenodo.org/api"
 # The Zenodo deposit DataPipe writes each pilot into (one per pilot; add the next pilot's here)
-DEPOSITS = {1: 22944626}
+DEPOSITS = {1: 22944626, 2: None}  # pilot 2: set once its DataPipe experiment exists
 HERE = Path(__file__).resolve().parent
 
 CHUNK = 1 << 16  # bytes a download is read in, so a big archive never lands in memory whole

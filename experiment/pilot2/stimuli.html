@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Pilot 2 stimuli</title>
+        <!-- Sanity check of pilot 2's stimuli, drawn with the task's own stimulus.js and DESIGN, so it
+             always shows the current levels. Not part of the task. Open locally (no server needed). -->
+        <script src="stimulus.js"></script>
+        <script src="design.js"></script>
+        <style>
+            body { background: #222; color: #ddd; font-family: sans-serif; margin: 0; padding: 16px; }
+            h2 { margin: 32px 0 4px; font-size: 18px; }
+            p.note { margin: 0 0 12px; color: #999; font-size: 14px; }
+            .grid { display: grid; gap: 12px; }
+            figure { margin: 0; }
+            canvas { width: 100%; height: auto; display: block; cursor: zoom-in; image-rendering: pixelated; }
+            figcaption { font-size: 12px; color: #aaa; margin-top: 2px; font-family: monospace; }
+        </style>
+    </head>
+    <body>
+        <h1>Pilot 2 stimuli</h1>
+        <p class="note">
+            Drawn at 800 x 600 (Pyllusion's default) with seed 1. Images are scaled to fit, so dither may
+            look finer than it is: click one to open it at full size. "panel ratio" is the predicted
+            left/right panel luminance ratio (1 = matched).
+        </p>
+        <div id="sections"></div>
+        <script>
+            const W = 800
+            const H = 600
+            const base = Object.assign({}, DESIGN.fixed, { width: W, height: H, seed: 1, difference: 0.1, illusion_strength: 1 })
+            // The density x outline combinations the task uses
+            const combos = DESIGN.factors.density_outline
+            Object.assign(base, combos.find((c) => c.outline > 0) || combos[0]) // sparsest density with the ring
+
+            function section(title, note, columns, cells) {
+                const root = document.getElementById("sections")
+                root.insertAdjacentHTML("beforeend", "<h2>" + title + "</h2><p class='note'>" + note + "</p>")
+                const grid = document.createElement("div")
+                grid.className = "grid"
+                grid.style.gridTemplateColumns = "repeat(" + columns + ", minmax(0, 1fr))"
+                root.appendChild(grid)
+                for (const options of cells) {
+                    const figure = document.createElement("figure")
+                    const canvas = document.createElement("canvas")
+                    const caption = document.createElement("figcaption")
+                    const o = Object.assign({}, base, options)
+                    try {
+                        const params = Chromostereopsis.draw(canvas, Chromostereopsis.parameters(o))
+                        caption.textContent =
+                            "strength " + o.illusion_strength + " | diff " + o.difference + " | density " + o.density +
+                            " | outline " + o.outline + "px | panel ratio " + params.Luminance_Panel_Ratio.toFixed(2) +
+                            (isExcluded(DESIGN, o) ? " | EXCLUDED from the task" : "")
+                    } catch (error) {
+                        caption.textContent = "error: " + error.message
+                    }
+                    canvas.addEventListener("click", () => {
+                        const tab = window.open()
+                        if (tab) tab.document.write("<body style='margin:0;background:#000'><img src='" + canvas.toDataURL() + "'></body>")
+                    })
+                    figure.append(canvas, caption)
+                    grid.appendChild(figure)
+                }
+            }
+
+            // 1. Density x outline: the combinations in DESIGN (rows = density, columns = outline)
+            const outlines = [...new Set(combos.map((c) => c.outline))]
+            section(
+                "Density x outline",
+                "The task's combinations: density (rows) against outline width in pixels (columns, 0 = no outline). Strength 1, difference 0.1.",
+                outlines.length,
+                combos
+            )
+
+            // 2. Illusion strength, at each density x outline combination in DESIGN
+            for (const combo of combos) {
+                section(
+                    "Illusion strength (density " + combo.density + ", outline " + combo.outline + "px)",
+                    "All " + DESIGN.illusion_strength.length + " strength levels, difference 0.1 (left larger).",
+                    3,
+                    DESIGN.illusion_strength.map((s) => Object.assign({ illusion_strength: s }, combo))
+                )
+            }
+
+            // 3. Difference: smallest to largest, both signs
+            section(
+                "Difference",
+                "All " + DESIGN.difference.length + " levels, positive (left larger) then negative. Strength 1, density " + base.density + ", outline " + base.outline + "px.",
+                3,
+                DESIGN.difference.flatMap((d) => [{ difference: d }, { difference: -d }])
+            )
+        </script>
+    </body>
+</html>
