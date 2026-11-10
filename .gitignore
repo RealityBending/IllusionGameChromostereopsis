@@ -50,6 +50,7 @@ rsconnect/
 
 # Sessions pulled off Zenodo by data/download.py (data/pilotN/raw/): participant data, never committed (public repo)
 data/*/raw/
+data/*/raw
 __pycache__/
 
 # macOS folder metadata
