@@ -9,8 +9,8 @@
              is not ours; see README.md > Saving. -->
         <script src="vendor/datapipe-client.js"></script>
         <script src="stimulus.js"></script>
-        <script src="part1_size/design.js"></script>
-        <script src="part2_depth/design.js"></script>
+        <script src="task1_size/design.js"></script>
+        <script src="task2_depth/design.js"></script>
         <script src="experiment.js"></script>
         <style>
             /* Black surround throughout: background luminance modulates the illusion, and switching
@@ -235,7 +235,7 @@
                 visibility: hidden;
                 image-rendering: pixelated; /* keep dither cells crisp if the browser ever scales it */
             }
-            /* Depth task answers: dim, below the stimulus, shown only during part 2. Buttons so that a
+            /* Depth task answers: dim, below the stimulus, shown only during task 2. Buttons so that a
                touch screen can give three answers; keys work as well. */
             #depth-responses {
                 display: none;
@@ -505,7 +505,7 @@
                 </p>
                 <p>
                     There are <span id="n-trials"></span> trials in <span id="n-blocks"></span> short
-                    blocks, with a break between blocks, then a short second part (explained when you
+                    blocks, with a break between blocks, then a short second task (explained when you
                     get there). Keep both eyes open and stay in full screen.
                     <span class="touch-only">On a phone, hold it in <b>landscape</b> for a larger display.</span>
                 </p>
@@ -533,11 +533,11 @@
             <div id="break-text" class="text"></div>
         </section>
 
-        <!-- Part 2: depth task instructions -->
+        <!-- Task 2: depth task instructions -->
         <section id="screen-depth-instructions" class="screen">
             <div class="text">
-                <h1>Part 2</h1>
-                <p>Well done! This last part is short (<span id="n-depth-trials"></span> trials).</p>
+                <h1>Task 2</h1>
+                <p>Well done! This last task is short (<span id="n-depth-trials"></span> trials).</p>
                 <p>
                     You will see <b>one circle at a time</b>, with a <b>surrounding area</b> of another
                     colour. Tell us <b>which looks nearer to you: the circle or the surrounding
@@ -552,7 +552,7 @@
                     bottom of the screen.
                 </p>
                 <p>Keep both eyes open.</p>
-                <button id="depth-button">Begin part 2</button>
+                <button id="depth-button">Begin task 2</button>
             </div>
         </section>
 

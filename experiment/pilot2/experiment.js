@@ -26,8 +26,8 @@ const Experiment = (() => {
         },
         demographics: {},
         design: null,
-        trials: [], // part 1, size task
-        depth_trials: [], // part 2, depth task
+        trials: [], // task 1, size task
+        depth_trials: [], // task 2, depth task
     }
     let trials = []
     let depthTrials = []
@@ -36,17 +36,17 @@ const Experiment = (() => {
     // A test run (`?test` in the URL, or the page opened from disk or a local server) is saved like
     // any other, but under a name starting `test_` and with `test: true` in the session, so it can
     // be told apart from participants' data (data/download.py counts it separately)
-    // `?part=2` skips consent, demographics and the size task and starts at the depth task, for
-    // checking part 2 without doing part 1 first. It always counts as a test run.
+    // `?task=2` skips consent, demographics and the size task and starts at the depth task, for
+    // checking task 2 without doing task 1 first. It always counts as a test run.
     const urlParams = new URLSearchParams(location.search)
-    const startPart = urlParams.get("part") === "2" ? 2 : 1
+    const startTask = urlParams.get("task") === "2" ? 2 : 1
     const isTest =
         urlParams.has("test") ||
-        startPart === 2 ||
+        startTask === 2 ||
         location.protocol === "file:" ||
         ["localhost", "127.0.0.1", ""].includes(location.hostname)
     log.session.test = isTest
-    log.session.start_part = startPart
+    log.session.start_task = startTask
 
     // Whether the device *can* take touch (logged as `touch_device`). Not used for the wording: it is
     // also true of touchscreen laptops, whose users have a keyboard and use it.
@@ -315,7 +315,7 @@ const Experiment = (() => {
         }
     }
 
-    // --- Part 2: depth task --------------------------------------------------------------------
+    // --- Task 2: depth task --------------------------------------------------------------------
     // One panel at a time, centred: a disc on its surround. "Which looks nearer, the circle or the
     // surrounding area?": circle, surround or no difference. No correct answer and no time limit: the stimulus
     // stays until the response.
@@ -403,7 +403,7 @@ const Experiment = (() => {
         show("screen-depth-instructions")
         await new Promise((resolve) => (document.getElementById("depth-button").onclick = resolve))
         show("screen-trial")
-        document.getElementById("progress-label").textContent = "Part 2"
+        document.getElementById("progress-label").textContent = "Task 2"
         document.getElementById("depth-responses").style.display = "flex"
         for (const trial of depthTrials) await runDepthTrial(trial, depthTrials.length)
         document.getElementById("depth-responses").style.display = "none"
@@ -577,8 +577,8 @@ const Experiment = (() => {
         const begin = async () => {
             fitCanvas()
             trials = makeTrials(DESIGN, canvasSize.width, canvasSize.height)
-            // Test runs only: `?size=`, `?gap=`, `?density=` or `?equiluminant=` override part 2's
-            // stimulus, for trying settings by eye (e.g. index.html?part=2&size=1.2&gap=0). A varied
+            // Test runs only: `?size=`, `?gap=`, `?density=` or `?equiluminant=` override task 2's
+            // stimulus, for trying settings by eye (e.g. index.html?task=2&size=1.2&gap=0). A varied
             // factor (e.g. size) is then held at that one value, so there are fewer trials.
             if (isTest) {
                 for (const key of ["size", "gap", "density", "equiluminant"]) {
@@ -597,14 +597,14 @@ const Experiment = (() => {
                 depth: Object.assign({ n_total: depthTrials.length }, DEPTH_DESIGN) }
             document.getElementById("n-depth-trials").textContent = depthTrials.length
             openSession()
-            if (startPart === 1) await runBlocks()
+            if (startTask === 1) await runBlocks()
             await runDepth()
             finish()
         }
         document.getElementById("instructions-button").onclick = begin
         document.getElementById("n-trials").textContent = DESIGN.n_total
         document.getElementById("n-blocks").textContent = DESIGN.n_blocks
-        if (startPart === 2) begin()
+        if (startTask === 2) begin()
         else show("screen-consent")
     }
 

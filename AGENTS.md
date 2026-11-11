@@ -34,7 +34,7 @@ The study is screening, not effect estimation, and does not assess Illusion Game
 | Where | What |
 | ----- | ---- |
 | `Pyllusion/pyllusion/Chromostereopsis/` | The stimulus. `Chromostereopsis.py` holds the literature review, the mechanisms, the candidate design and the open questions; `chromostereopsis_parameters.py` computes the parameter dictionary; `chromostereopsis_image.py` renders it. Still a **prototype**, not in the public API. |
-| `experiment/pilotN/` (this repo) | One pilot's experiment: dependency-free HTML/JS, `stimulus.js` being a port of the Pyllusion parameter and image functions (so a trial can be re-rendered from its recorded `Seed`). `design.js` holds `DESIGN` and builds the trial list (from pilot 2, one folder per part of the session: `part1_size/design.js`, `part2_depth/design.js`). See its `README.md`. Served by GitHub Pages at `https://realitybendinglab.com/IllusionGameChromostereopsis/experiment/pilotN/`, so anything pushed to `main` is live; `experiment/index.html` is only a landing page linking to the pilots. |
+| `experiment/pilotN/` (this repo) | One pilot's experiment: dependency-free HTML/JS, `stimulus.js` being a port of the Pyllusion parameter and image functions (so a trial can be re-rendered from its recorded `Seed`). `design.js` holds `DESIGN` and builds the trial list (from pilot 2, one folder per task of the session: `task1_size/design.js`, `task2_depth/design.js`). See its `README.md`. Served by GitHub Pages at `https://realitybendinglab.com/IllusionGameChromostereopsis/experiment/pilotN/`, so anything pushed to `main` is live; `experiment/index.html` is only a landing page linking to the pilots. |
 | this repo | The data (`data/pilotN/`) and the analysis (`analysis/pilotN/`). |
 
 ### One folder per pilot
@@ -116,14 +116,16 @@ assignment is the only difference between them). One random `seed` per trial, lo
 **`outline`** (pilot 2, not in Pyllusion): a solid coloured outline, in the disc's own colour, just inside its
 edge, in pixels (0 = none). It keeps the disc's edge, and so its size, defined when the disc is
 sparsely dithered. It is invisible on a solid disc, so it only matters below `density = 1`; pilot 2
-crosses the two (0 and 4 px x density 0.1, 0.5, 1), except density 0.1 without the coloured outline.
+crosses the two (0 and 4 px x density 0.1, 0.5, 1), minus two combinations (below), leaving 4
+distinct conditions.
 
 **Excluded combinations**: pilot 1, `illusion_strength = 0` with `gap = 0` (same colour and no
 visible edge, so the disc is invisible); offending trials are repaired by *swapping* a factor level
-with another trial, which preserves every factor's marginal balance. Pilot 2, `density = 0.1` with
-`outline = 0` at every strength: with 9 in 10 dither cells black, the disc's edge is too ill-defined
-to judge size by (invisible at strength 0). That combination is dropped from the factor's levels, so
-coloured outline vs none can only be compared at density 0.5.
+with another trial, which preserves every factor's marginal balance. Pilot 2, at every strength: `density = 0.1` with
+`outline = 0` (with 9 in 10 dither cells black, the disc's edge is too ill-defined to judge size by;
+invisible at strength 0), and `density = 1` with an outline (the same image as without it, so not
+repeated; density 1 is the solid reference for both outline levels). Both are dropped from the
+factor's levels, so coloured outline vs none can only be compared at density 0.5.
 
 ### The brightness confound, which is the thing to watch
 
@@ -213,11 +215,11 @@ measures (e.g. vernier alignment for chromatic aberration).
 It is not a replacement for the size task but does two things:
 
 1. **Classifies each participant** as red nearer, blue nearer, no depth or unclear (conservative;
-   cut-offs set from the part 2 answers before looking at the size data): a grouping for looking at
+   cut-offs set from the task 2 answers before looking at the size data): a grouping for looking at
    the size bias, so opposite effects are not averaged out, and a count of interest in itself.
 2. **Could test stimulus factors as moderators of the depth seen.** Not in pilot 2, which keeps
-   part 2 short and solid (no dither); in the main experiment, part 2 can use whichever dither gives
-   the strongest effect in part 1.
+   task 2 short and solid (no dither); in the main experiment, task 2 can use whichever dither gives
+   the strongest effect in task 1.
 
 It does not lift the optics vs perception limitation: it says what people see, not whether the
 cause is optical.
@@ -253,6 +255,6 @@ stimulus), and artificial pupils, which reverse the effect in many observers.
 ## Status
 
 - **Pilot 1** is finished: 15 participants, written up in `analysis/pilot1/pilot_analysis.pdf`.
-- **Pilot 2** is in design: size task plus a short depth task (part 2); changes listed in
+- **Pilot 2** is in design: size task plus a short depth task (task 2); changes listed in
   `experiment/pilot2/README.md`; check stimuli with
-  `experiment/pilot2/part1_size/stimuli.html` and `part2_depth/stimuli.html`. No DataPipe experiment yet (`DATAPIPE_EXPERIMENT = ""`).
+  `experiment/pilot2/task1_size/stimuli.html` and `task2_depth/stimuli.html`. No DataPipe experiment yet (`DATAPIPE_EXPERIMENT = ""`).

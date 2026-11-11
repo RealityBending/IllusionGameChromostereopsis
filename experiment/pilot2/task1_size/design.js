@@ -1,7 +1,7 @@
-// Part 1, size task: the experimental design. Sets of trials that fully cross the two main
+// Task 1, size task: the experimental design. Sets of trials that fully cross the two main
 // parameters, with the remaining stimulus factors assigned by balanced randomisation. Also holds
-// the helpers (shuffle, exclusions, ...) and the settings shared with part 2 (`fixed`, `exclude`,
-// `fixation_duration`, `mask`), so it loads before part2_depth/design.js.
+// the helpers (shuffle, exclusions, ...) and the settings shared with task 2 (`fixed`, `exclude`,
+// `fixation_duration`, `mask`), so it loads before task2_depth/design.js.
 //
 // The two parameters of interest are task difficulty (`difference`, the objective area difference
 // between the discs) and `illusion_strength` (the chromatic separation between each disc and its
@@ -34,10 +34,9 @@ const DESIGN = {
     // Remaining stimulus factors, each with the levels to be balanced within a set. A level can also
     // be an object, which sets several options at once: that is how two factors are crossed rather
     // than balanced separately. Pilot 2 fixes all of pilot 1's factors but density, and crosses it
-    // with `outline`, a solid coloured outline in the disc's own colour at its edge (in pixels, 0 = none). Of the
-    // 6 combinations (`density_outline_all`), density 0.1 without the coloured outline is excluded (see `exclude`),
-    // leaving 5, balanced within each set of 42 (8 or 9 each). At density 1 the coloured outline is invisible, so
-    // those two are identical images (a built-in check).
+    // with `outline`, a solid coloured outline in the disc's own colour at its edge (in pixels,
+    // 0 = none). Of the 6 combinations (`density_outline_all`), two are excluded (see `exclude`),
+    // leaving 4 distinct conditions, balanced within each set of 42 (10 or 11 each).
     density_outline_all: [0.1, 0.5, 1].flatMap((density) => [0, 4].map((outline) => ({ density, outline }))),
     factors: {
         density_outline: null, // set below: density_outline_all minus the excluded combinations
@@ -53,6 +52,10 @@ const DESIGN = {
         // disc's edge is only where the dot colour changes, too ill-defined to judge size by (and
         // invisible at strength 0, where disc and surround are the same purple)
         (o) => o.density === 0.1 && o.outline === 0,
+        // Density 1 with the coloured outline: the outline is invisible on a solid disc, so this is
+        // the same image as density 1 without it. Not repeated; density 1 (no outline) serves as the
+        // solid reference for both the with- and without-outline comparisons
+        (o) => o.density === 1 && o.outline > 0,
     ],
 
     // Held constant

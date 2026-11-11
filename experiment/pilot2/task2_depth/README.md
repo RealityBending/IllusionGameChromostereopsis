@@ -1,14 +1,14 @@
-# Pilot 2, part 2: depth task
+# Pilot 2, task 2: depth task
 
-New in pilot 2. Runs straight after [part 1](../part1_size/README.md) in the same session, so depth
-can be linked to size. Try it alone with `index.html?part=2`.
+New in pilot 2. Runs straight after [task 1](../task1_size/README.md) in the same session, so depth
+can be linked to size. Try it alone with `index.html?task=2`.
 
 ## Aim
 
 **Classify each participant** as red nearer, blue nearer, or no depth: a grouping for the size
 analysis, and a count of interest in itself.
 
-Kept short, with no dither. Dither is tested in part 1; in the main (non-pilot) experiment, part 2
+Kept short, with no dither. Dither is tested in task 1; in the main (non-pilot) experiment, task 2
 can use whichever dither gives the strongest effect there.
 
 A depth report has no correct answer, so it cannot replace the size task. It comes after it so the
@@ -39,12 +39,12 @@ fixated at once.) Which looks nearer, the circle or the surrounding area?
 `Seed`) and its left panel copied to the centre, so the sign of `illusion_strength` is the disc's
 colour: + red on blue, - blue on red, 0 all purple.
 
-48 trials, solid (density 1, no dither), no outline, otherwise as part 1. Disc size varies: 0.5
-(as part 1), 0.75 and 1, so that fewer trials are identical repeats. There are likely too few
+48 trials, solid (density 1, no dither), no outline, otherwise as task 1. Disc size varies: 0.5
+(as task 1), 0.75 and 1, so that fewer trials are identical repeats. There are likely too few
 trials per size to test a difference between sizes.
 
 Test runs can override `size`, `gap`, `density` or `equiluminant` in the URL, e.g.
-`index.html?part=2&size=0.75&gap=0` (a varied factor is then held at that value).
+`index.html?task=2&size=0.75&gap=0` (a varied factor is then held at that value).
 
 | Per size (0.5, 0.75, 1) | Trials |
 | ----------------------- | ------ |
@@ -53,7 +53,7 @@ Test runs can override `size`, `gap`, `density` or `equiluminant` in the URL, e.
 | All purple (0) | 2 |
 
 - **Full strength only**: it classifies best; lower strengths, dither and `outline` are left to
-  part 1.
+  task 1.
 - **Trial count**: 42 red + blue trials (all sizes together) to classify each participant's depth
   direction. Raise `n_reps` if participants turn out less consistent than hoped.
 - **Purple** measures the figure-in-front bias. The red vs blue comparison already cancels it, so
@@ -89,10 +89,11 @@ figure-in-front bias does not decide the class.
 - **No depth**: mostly "No difference".
 - **Unclear**: anything else.
 
-Keep it conservative and put anyone borderline in Unclear. Choose the cut-offs from the part 2
+Keep it conservative and put anyone borderline in Unclear. Choose the cut-offs from the task 2
 answers alone and record them before comparing the classes on the
-part 1 size data. Optionally, check that a slightly stricter and a slightly looser cut-off give
-similar results. Report the counts in each class.
+task 1 size data. Optionally, check that a slightly stricter and a slightly looser cut-off give
+similar results. Report the counts in each class. The classes are used in step 6 of the
+[task 1 analysis](../task1_size/README.md#analysis).
 
 Checks: on purple trials, the share of "circle nearer" and of "No difference" (whether the task was
 understood); very fast answers (e.g. under ~300 ms), possibly given without looking.

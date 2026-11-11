@@ -1,4 +1,4 @@
-// Part 2, depth task: the experimental design. Loads after part1_size/design.js, whose helpers
+// Task 2, depth task: the experimental design. Loads after task1_size/design.js, whose helpers
 // (shuffle, applyLevel, isExcluded, randomInteger) and shared settings (DESIGN.fixed,
 // DESIGN.exclude, DESIGN.fixation_duration, DESIGN.mask) it uses.
 //
@@ -12,9 +12,9 @@
 // Kept short and simple: full-strength red and blue discs, and strength 0 (disc and surround the same
 // purple), solid (density 1, no dither) and no outline. As only the left panel is shown, the sign of
 // the strength is the disc's colour (positive = red disc on blue). Dither is not varied here: in the
-// main experiment, part 2 can use whichever dither gives the strongest effect in part 1.
+// main experiment, task 2 can use whichever dither gives the strongest effect in task 1.
 //
-// Disc size varies (0.5, 0.75, 1; part 1 uses 0.5), so that fewer trials are identical repeats.
+// Disc size varies (0.5, 0.75, 1; task 1 uses 0.5), so that fewer trials are identical repeats.
 // There are likely too few trials per size to test a difference between sizes.
 //
 // 21 red + 21 blue discs to classify each participant's depth direction. Strength 0 gives the
@@ -26,8 +26,8 @@ const DEPTH_DESIGN = {
     n_reps: { "-1": 7, 0: 2, 1: 7 }, // per strength level and size; a number = the same for all
     illusion_strength: [-1, 0, 1],
     factors: { size: [0.5, 0.75, 1] }, // fully crossed with strength; varied, not planned as a test
-    // Overrides DESIGN.fixed. Solid discs: dither is tested in part 1, and the main experiment's
-    // part 2 can use whichever dither works best there. (Disc sizes: equal disc and surround areas
+    // Overrides DESIGN.fixed. Solid discs: dither is tested in task 1, and the main experiment's
+    // task 2 can use whichever dither works best there. (Disc sizes: equal disc and surround areas
     // at about 1.06; the largest that fits with the gap is about 1.29.)
     fixed: { density: 1, outline: 0 },
     difference: 0, // discs the same size (it would only matter for the hidden panel anyway)
