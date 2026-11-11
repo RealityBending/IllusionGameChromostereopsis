@@ -8,7 +8,7 @@
 // two panels are identical. `difference` is the objective area difference between the two discs
 // (positive = left larger), defined as in Pyllusion's Delboeuf.
 //
-// Pilot 2 adds one option not in Pyllusion: `outline`, a solid ring of the disc's own colour at its
+// Pilot 2 adds one option not in Pyllusion: `outline`, a solid coloured outline in the disc's own colour at its
 // edge (in pixels, 0 = none, i.e. Pyllusion's behaviour), so the disc keeps a crisp edge at low density.
 //
 // Geometry uses Pyllusion's grid units: sizes are a proportion of the canvas height (2 = full height),
@@ -195,7 +195,7 @@ const Chromostereopsis = (() => {
         const lumSurroundRight = lumInnerLeft
 
         // Predicted mean luminance of each panel (analytic, from areas and densities)
-        // The outline ring is solid, so it counts at full density
+        // The coloured outline is solid, so it counts at full density
         const outlineRelative = (2 * o.outline) / sizePanelPx
         const panelLuminance = (radius, lumInner, lumSurround) => {
             const areaDisc = discArea(radius) / 4

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Pilot 2 part 2 stimuli</title>
+        <!-- Sanity check of pilot 2's part 2 (depth task) stimuli, drawn with the task's own
+             stimulus.js, DESIGN and DEPTH_DESIGN, so it always shows the current levels. Not part of
+             the task. Open locally (no
+             server needed). Part 1's: ../part1_size/stimuli.html. -->
+        <script src="../stimulus.js"></script>
+        <script src="../part1_size/design.js"></script>
+        <script src="design.js"></script>
+        <style>
+            body { background: #222; color: #ddd; font-family: sans-serif; margin: 0; padding: 16px; }
+            h2 { margin: 32px 0 4px; font-size: 18px; }
+            p.note { margin: 0 0 12px; color: #999; font-size: 14px; }
+            .grid { display: grid; gap: 12px; }
+            figure { margin: 0; }
+            canvas { width: 100%; height: auto; display: block; cursor: zoom-in; image-rendering: pixelated; }
+            figcaption { font-size: 12px; color: #aaa; margin-top: 2px; font-family: monospace; }
+        </style>
+    </head>
+    <body>
+        <h1>Pilot 2, part 2 (depth) stimuli</h1>
+        <p class="note">
+            Drawn at 800 x 600 (Pyllusion's default) with seed 1, as in the task: the full stimulus is drawn
+            and its left panel copied to the centre. Images are scaled to fit: click one to open it at full
+            size.
+        </p>
+        <div id="sections"></div>
+
+        <script>
+            const W = 800
+            const H = 600
+
+            // Same as experiment.js: draw the full stimulus off screen, copy one panel to the centre
+            function drawSinglePanel(canvas, params, side) {
+                const offscreen = document.createElement("canvas")
+                Chromostereopsis.draw(offscreen, params)
+                const rect = Chromostereopsis.panelRects(params).find((r) => r.side === side)
+                canvas.width = params.Width
+                canvas.height = params.Height
+                const ctx = canvas.getContext("2d")
+                ctx.fillStyle = "rgb(" + params.Color_Background.join(",") + ")"
+                ctx.fillRect(0, 0, canvas.width, canvas.height)
+                const x = Math.floor((canvas.width - rect.size) / 2)
+                ctx.drawImage(offscreen, rect.x, rect.y, rect.size, rect.size, x, rect.y, rect.size, rect.size)
+            }
+
+            const colorName = (s) => (s > 0 ? "red disc on blue" : s < 0 ? "blue disc on red" : "all purple")
+            const strengths = DEPTH_DESIGN.illusion_strength.slice().sort((a, b) => b - a) // red, purple, blue
+            const sizes = (DEPTH_DESIGN.factors.size || [DESIGN.fixed.size]).slice()
+
+            // Rows = disc size, columns = disc colour
+            const root = document.getElementById("sections")
+            root.insertAdjacentHTML(
+                "beforeend",
+                "<h2>Disc colour x size</h2><p class='note'>Every condition in DEPTH_DESIGN: rows = disc size, " +
+                    "columns = colour. Solid discs (density " + DEPTH_DESIGN.fixed.density + "), outline " +
+                    DEPTH_DESIGN.fixed.outline + "px.</p>"
+            )
+            const grid = document.createElement("div")
+            grid.className = "grid"
+            grid.style.gridTemplateColumns = "repeat(" + strengths.length + ", minmax(0, 1fr))"
+            root.appendChild(grid)
+            for (const size of sizes) {
+                for (const strength of strengths) {
+                    const figure = document.createElement("figure")
+                    const canvas = document.createElement("canvas")
+                    const caption = document.createElement("figcaption")
+                    const o = Object.assign({}, DESIGN.fixed, DEPTH_DESIGN.fixed, {
+                        size: size,
+                        illusion_strength: strength,
+                        difference: DEPTH_DESIGN.difference,
+                        width: W,
+                        height: H,
+                        seed: 1,
+                    })
+                    try {
+                        drawSinglePanel(canvas, Chromostereopsis.parameters(o), "Left")
+                        caption.textContent = colorName(strength) + " | size " + size
+                    } catch (error) {
+                        caption.textContent = "error: " + error.message
+                    }
+                    canvas.addEventListener("click", () => {
+                        const tab = window.open()
+                        if (tab) tab.document.write("<body style='margin:0;background:#000'><img src='" + canvas.toDataURL() + "'></body>")
+                    })
+                    figure.append(canvas, caption)
+                    grid.appendChild(figure)
+                }
+            }
+        </script>
+    </body>
+</html>

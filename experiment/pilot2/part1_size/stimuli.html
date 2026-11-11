@@ -3,10 +3,11 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Pilot 2 stimuli</title>
-        <!-- Sanity check of pilot 2's stimuli, drawn with the task's own stimulus.js and DESIGN, so it
-             always shows the current levels. Not part of the task. Open locally (no server needed). -->
-        <script src="stimulus.js"></script>
+        <title>Pilot 2 part 1 stimuli</title>
+        <!-- Sanity check of pilot 2's part 1 (size task) stimuli, drawn with the task's own stimulus.js
+             and DESIGN, so it always shows the current levels. Not part of the task. Open locally (no
+             server needed). Part 2's: ../part2_depth/stimuli.html. -->
+        <script src="../stimulus.js"></script>
         <script src="design.js"></script>
         <style>
             body { background: #222; color: #ddd; font-family: sans-serif; margin: 0; padding: 16px; }
@@ -16,10 +17,12 @@
             figure { margin: 0; }
             canvas { width: 100%; height: auto; display: block; cursor: zoom-in; image-rendering: pixelated; }
             figcaption { font-size: 12px; color: #aaa; margin-top: 2px; font-family: monospace; }
+            figure.excluded canvas { outline: 4px solid #e33; opacity: 0.6; }
+            figure.excluded figcaption { color: #f66; font-weight: bold; }
         </style>
     </head>
     <body>
-        <h1>Pilot 2 stimuli</h1>
+        <h1>Pilot 2, part 1 (size) stimuli</h1>
         <p class="note">
             Drawn at 800 x 600 (Pyllusion's default) with seed 1. Images are scaled to fit, so dither may
             look finer than it is: click one to open it at full size. "panel ratio" is the predicted
@@ -30,9 +33,9 @@
             const W = 800
             const H = 600
             const base = Object.assign({}, DESIGN.fixed, { width: W, height: H, seed: 1, difference: 0.1, illusion_strength: 1 })
-            // The density x outline combinations the task uses
-            const combos = DESIGN.factors.density_outline
-            Object.assign(base, combos.find((c) => c.outline > 0) || combos[0]) // sparsest density with the ring
+            // All density x outline combinations, the excluded ones included (marked in their captions)
+            const combos = DESIGN.density_outline_all
+            Object.assign(base, combos.find((c) => c.outline > 0) || combos[0]) // sparsest density with the coloured outline
 
             function section(title, note, columns, cells) {
                 const root = document.getElementById("sections")
@@ -46,6 +49,7 @@
                     const canvas = document.createElement("canvas")
                     const caption = document.createElement("figcaption")
                     const o = Object.assign({}, base, options)
+                    if (isExcluded(DESIGN, o)) figure.className = "excluded"
                     try {
                         const params = Chromostereopsis.draw(canvas, Chromostereopsis.parameters(o))
                         caption.textContent =
@@ -68,7 +72,7 @@
             const outlines = [...new Set(combos.map((c) => c.outline))]
             section(
                 "Density x outline",
-                "The task's combinations: density (rows) against outline width in pixels (columns, 0 = no outline). Strength 1, difference 0.1.",
+                "All combinations: density (rows) against outline width in pixels (columns, 0 = no outline). Strength 1, difference 0.1. Red-framed ones are EXCLUDED from the task.",
                 outlines.length,
                 combos
             )
@@ -76,7 +80,8 @@
             // 2. Illusion strength, at each density x outline combination in DESIGN
             for (const combo of combos) {
                 section(
-                    "Illusion strength (density " + combo.density + ", outline " + combo.outline + "px)",
+                    "Illusion strength (density " + combo.density + ", outline " + combo.outline + "px)" +
+                        (isExcluded(DESIGN, combo) ? " &mdash; EXCLUDED from the task" : ""),
                     "All " + DESIGN.illusion_strength.length + " strength levels, difference 0.1 (left larger).",
                     3,
                     DESIGN.illusion_strength.map((s) => Object.assign({ illusion_strength: s }, combo))

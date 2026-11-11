@@ -22,6 +22,10 @@ Two accounts predict **opposite** directions:
   *smaller*, so the red disc should be judged smaller.
 - **Irradiation**: the *brighter* shape looks larger, so the red disc should be judged larger.
 
+Pilot 1 tested irradiation by varying `equiluminant`. From pilot 2 the colours are always
+equiluminant, which removes the brightness difference irradiation depends on, so it is controlled
+rather than tested and is no longer a focus.
+
 The study is screening, not effect estimation, and does not assess Illusion Game suitability (see
 **Limitation: optics vs perception**).
 
@@ -30,7 +34,7 @@ The study is screening, not effect estimation, and does not assess Illusion Game
 | Where | What |
 | ----- | ---- |
 | `Pyllusion/pyllusion/Chromostereopsis/` | The stimulus. `Chromostereopsis.py` holds the literature review, the mechanisms, the candidate design and the open questions; `chromostereopsis_parameters.py` computes the parameter dictionary; `chromostereopsis_image.py` renders it. Still a **prototype**, not in the public API. |
-| `experiment/pilotN/` (this repo) | One pilot's experiment: dependency-free HTML/JS, `stimulus.js` being a port of the Pyllusion parameter and image functions (so a trial can be re-rendered from its recorded `Seed`). `design.js` holds `DESIGN` and builds the trial list. See its `README.md`. Served by GitHub Pages at `https://realitybendinglab.com/IllusionGameChromostereopsis/experiment/pilotN/`, so anything pushed to `main` is live; `experiment/index.html` is only a landing page linking to the pilots. |
+| `experiment/pilotN/` (this repo) | One pilot's experiment: dependency-free HTML/JS, `stimulus.js` being a port of the Pyllusion parameter and image functions (so a trial can be re-rendered from its recorded `Seed`). `design.js` holds `DESIGN` and builds the trial list (from pilot 2, one folder per part of the session: `part1_size/design.js`, `part2_depth/design.js`). See its `README.md`. Served by GitHub Pages at `https://realitybendinglab.com/IllusionGameChromostereopsis/experiment/pilotN/`, so anything pushed to `main` is live; `experiment/index.html` is only a landing page linking to the pilots. |
 | this repo | The data (`data/pilotN/`) and the analysis (`analysis/pilotN/`). |
 
 ### One folder per pilot
@@ -50,9 +54,10 @@ identical and use the same two colours with the roles swapped — one red disc o
 blue disc on red — so they differ *only* in which colour is figure and which is ground.
 
 The participant reports **which disc is larger**, with the arrow keys, as fast as possible.
-The illusion is measured **objectively only**: no subjective depth report is collected at
-any stage. It shows up as an asymmetry of error rates (and RTs) between the two signs of
-`illusion_strength`, i.e. between the red disc being on the left and on the right.
+The illusion is measured **objectively** in this task: it shows up as an asymmetry of error rates
+(and RTs) between the two signs of `illusion_strength`, i.e. between the red disc being on the left
+and on the right. Pilot 1 collected no depth report. From pilot 2, a short **depth task** follows
+the size task in the same session (see **Measuring perceived depth**).
 
 ## The parameters
 
@@ -108,15 +113,17 @@ chromostereopsis; note that on black every colour has a Michelson contrast of 1,
 `luminance2=1`, `dither_shared=true` (both panels get the same dither pattern, so colour
 assignment is the only difference between them). One random `seed` per trial, logged.
 
-**`outline`** (pilot 2, not in Pyllusion): a solid ring of the disc's own colour just inside its
+**`outline`** (pilot 2, not in Pyllusion): a solid coloured outline, in the disc's own colour, just inside its
 edge, in pixels (0 = none). It keeps the disc's edge, and so its size, defined when the disc is
 sparsely dithered. It is invisible on a solid disc, so it only matters below `density = 1`; pilot 2
-fully crosses the two (0 and 4 px x density 0.1, 0.5, 1).
+crosses the two (0 and 4 px x density 0.1, 0.5, 1), except density 0.1 without the coloured outline.
 
-**Excluded combination**: `illusion_strength = 0` with `gap = 0` in pilot 1, and with
-`density = 0.1` and `outline = 0` in pilot 2 — same colour and no visible edge, so the disc is
-invisible. Offending trials are repaired by *swapping* a factor level with
-another trial, which preserves every factor's marginal balance.
+**Excluded combinations**: pilot 1, `illusion_strength = 0` with `gap = 0` (same colour and no
+visible edge, so the disc is invisible); offending trials are repaired by *swapping* a factor level
+with another trial, which preserves every factor's marginal balance. Pilot 2, `density = 0.1` with
+`outline = 0` at every strength: with 9 in 10 dither cells black, the disc's edge is too ill-defined
+to judge size by (invisible at strength 0). That combination is dropped from the factor's levels, so
+coloured outline vs none can only be compared at density 0.5.
 
 ### The brightness confound, which is the thing to watch
 
@@ -185,8 +192,64 @@ averaged out.
 or measure the perceptual stage on its own. These would likely need a lab study with optical
 measures (e.g. vernier alignment for chromatic aberration).
 
+## Measuring perceived depth
+
+### Why size is the main measure, not depth
+
+- **A depth report has no correct answer.** Neither disc on a flat screen is nearer, so "which
+  looks nearer?" cannot be scored. There is no accuracy, psychometric curve or point of subjective
+  equality, guesses and response habits cannot be told apart from a real percept, and the effect
+  cannot be traded off against difficulty (the Illusion Game approach). A size judgement has a true
+  answer on every trial, so the illusion shows as an objective bias that can be scaled against
+  `difference` and `illusion_strength`.
+- **The size question is the research question.** The primary aim is whether depth carries over
+  into size; a depth report cannot answer that on its own.
+- **Less open to demand effects.** In the size task participants do not know the study is about
+  colour or depth; asking about depth tells them.
+- **Online, a depth report is coarse.** The precise methods need lab equipment (below).
+
+### What a depth report adds
+
+It is not a replacement for the size task but does two things:
+
+1. **Classifies each participant** as red nearer, blue nearer or no depth (plus how consistent
+   they are): a grouping for the size analysis, so opposite effects are not averaged out, and a
+   count of interest in itself.
+2. **Could test stimulus factors as moderators of the depth seen.** Not in pilot 2, which keeps
+   part 2 short and solid (no dither); in the main experiment, part 2 can use whichever dither gives
+   the strongest effect in part 1.
+
+It does not lift the optics vs perception limitation: it says what people see, not whether the
+cause is optical.
+
+### Options considered
+
+1. **Direct depth judgement after the size task** (chosen for pilot 2). One panel at a time,
+   centred: "which looks nearer, the circle or the surrounding area?", answered circle, surround or no
+   difference (10-20% of observers see no depth, so a forced two-way choice would hide them). A
+   first version showed both panels and asked which circle was nearer, but two discs cannot be
+   fixated at once, which made it hard to judge. Figures tend to look in front of their ground
+   anyway, so the measure is the difference between red discs and blue discs; strength 0 trials
+   (disc and surround the same purple) measure that figure-in-front bias. Participants are asked
+   about the "surrounding area" (button: "Surround nearer"), not the "background", which already
+   implies behind. Only full-strength red and blue discs and strength 0 are shown, solid (density 1, no
+   dither), with no outline, and disc size varied (0.5, 0.75, 1; not planned as a test) so the
+   classification does not depend on one size: the task only has to classify each participant, so the lower
+   strengths, dither and `outline` are left to the size task. Run **after** the size task so that the size
+   judgements are made before participants know the study is about depth. A few minutes.
+   Weaknesses: subjective, open to demand effects, and "which is nearer" on a flat screen is an odd
+   question, so some will guess.
+2. **Nulling by colour adjustment** (not yet implemented). Participants adjust the colour balance of
+   one panel until the discs look level in depth; the setting is a continuous measure of each
+   person's depth strength. Fiddly online and slower than option 1.
+
+**Not practical online:** matching against a probe with real binocular disparity (the classic lab
+method; needs a stereoscope or shutter glasses, and red/cyan anaglyph glasses clash with the red/blue
+stimulus), and artificial pupils, which reverse the effect in many observers.
+
 ## Status
 
 - **Pilot 1** is finished: 15 participants, written up in `analysis/pilot1/pilot_analysis.pdf`.
-- **Pilot 2** is in design: changes listed in `experiment/pilot2/README.md`; check stimuli with
-  `experiment/pilot2/stimuli.html`. No DataPipe experiment yet (`DATAPIPE_EXPERIMENT = ""`).
+- **Pilot 2** is in design: size task plus a short depth task (part 2); changes listed in
+  `experiment/pilot2/README.md`; check stimuli with
+  `experiment/pilot2/part1_size/stimuli.html` and `part2_depth/stimuli.html`. No DataPipe experiment yet (`DATAPIPE_EXPERIMENT = ""`).

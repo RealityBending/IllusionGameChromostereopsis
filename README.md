@@ -31,13 +31,14 @@ Add `?test` to a URL to try it without counting as data.
 | `illusion_strength` | -1 to 1 in 0.5 steps (5) | -1 to 1 in thirds (7) |
 | `equiluminant` | false, true | true |
 | `gap` | 0, 0.02, 0.06 | 0.02 |
-| `size` | 0.25, 0.5, 0.75 | 0.5 |
+| `size` | 0.25, 0.5, 0.75 | 0.5 (depth task: 0.5, 0.75, 1) |
 | `dither_size` | 2, 4, 8 | 4 |
 | `size_panel` | fill, "match" | fill |
-| `density` | 0.5, 0.75, 1 | 0.1, 0.5, 1, crossed with `outline` (provisional) |
+| `density` | 0.5, 0.75, 1 | 0.1, 0.5, 1, crossed with `outline`, 0.1 only with it (provisional) |
 | `outline` | n/a | 0, 4 px, crossed with `density` (provisional) |
 | Left/right larger | balanced within each strength level | also within each difference size |
 | Trials | 10 sets of 25 = 250 | 6 sets of 42 = 252 |
+| Depth task | none | 48 trials after the size task, one disc at a time: "circle or surrounding area nearer?" |
 
 What each parameter does: [`AGENTS.md`](AGENTS.md#the-parameters). More on each pilot's changes:
 its `experiment/pilotN/README.md`.
@@ -46,6 +47,7 @@ its `experiment/pilotN/README.md`.
 
 ```
 experiment/pilotN/   the task (HTML/JS), frozen once run; its README covers design, data, saving
+                     (pilot 2: one subfolder and README per part, part1_size/ and part2_depth/)
 data/pilotN/manual/  sessions downloaded from the end screen, if any
 data/pilotN/raw/     sessions from Zenodo (git-ignored): python data/download.py --pilot N
 analysis/pilotN/     analysis.qmd (R)

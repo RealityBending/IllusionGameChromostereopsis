@@ -1,5 +1,7 @@
-// Experimental design: sets of trials that fully cross the two main parameters, with the remaining
-// stimulus factors assigned by balanced randomisation.
+// Part 1, size task: the experimental design. Sets of trials that fully cross the two main
+// parameters, with the remaining stimulus factors assigned by balanced randomisation. Also holds
+// the helpers (shuffle, exclusions, ...) and the settings shared with part 2 (`fixed`, `exclude`,
+// `fixation_duration`, `mask`), so it loads before part2_depth/design.js.
 //
 // The two parameters of interest are task difficulty (`difference`, the objective area difference
 // between the discs) and `illusion_strength` (the chromatic separation between each disc and its
@@ -30,22 +32,27 @@ const DESIGN = {
     illusion_strength: [-1, -0.67, -0.33, 0, 0.33, 0.67, 1],
 
     // Remaining stimulus factors, each with the levels to be balanced within a set. A level can also
-    // be an object, which sets several options at once: that is how two factors are fully crossed
-    // rather than balanced separately. Pilot 2 fixes all of pilot 1's factors but density, and crosses
-    // it with `outline`, a solid ring of the disc's own colour at its edge (in pixels, 0 = none): 6
-    // combinations, so 7 of each in a set of 42. At density 1 the ring is invisible, so those pairs
-    // are identical images (a built-in check).
+    // be an object, which sets several options at once: that is how two factors are crossed rather
+    // than balanced separately. Pilot 2 fixes all of pilot 1's factors but density, and crosses it
+    // with `outline`, a solid coloured outline in the disc's own colour at its edge (in pixels, 0 = none). Of the
+    // 6 combinations (`density_outline_all`), density 0.1 without the coloured outline is excluded (see `exclude`),
+    // leaving 5, balanced within each set of 42 (8 or 9 each). At density 1 the coloured outline is invisible, so
+    // those two are identical images (a built-in check).
+    density_outline_all: [0.1, 0.5, 1].flatMap((density) => [0, 4].map((outline) => ({ density, outline }))),
     factors: {
-        density_outline: [0.1, 0.5, 1].flatMap((density) => [0, 4].map((outline) => ({ density, outline }))),
+        density_outline: null, // set below: density_outline_all minus the excluded combinations
     },
 
     // Combinations that make no sense as a trial. Each rule is a predicate on the trial's options that
     // returns true when the trial must be excluded. Offending trials are repaired by swapping factor
     // levels with another trial, so the marginal balance of every factor is preserved.
+    // A rule that does not depend on the trial's grid cell (strength, difference) removes the
+    // combination from the factor's levels altogether (see below).
     exclude: [
-        // Same purple inside and out, sparse, no ring: the black gap is lost among the black dither
-        // cells, so the disc's edge cannot be seen
-        (o) => o.illusion_strength === 0 && o.density === 0.1 && o.outline === 0,
+        // Density 0.1 without the coloured outline: 9 in 10 dither cells are black, so the gap is lost and the
+        // disc's edge is only where the dot colour changes, too ill-defined to judge size by (and
+        // invisible at strength 0, where disc and surround are the same purple)
+        (o) => o.density === 0.1 && o.outline === 0,
     ],
 
     // Held constant
@@ -73,6 +80,7 @@ const DESIGN = {
 }
 
 // Derived
+DESIGN.factors.density_outline = DESIGN.density_outline_all.filter((combo) => !isExcluded(DESIGN, combo))
 DESIGN.n_per_set = DESIGN.difference.length * DESIGN.illusion_strength.length
 DESIGN.n_total = DESIGN.n_sets * DESIGN.n_per_set
 
@@ -230,3 +238,4 @@ function makeTrials(design, width, height) {
     })
     return trials
 }
+

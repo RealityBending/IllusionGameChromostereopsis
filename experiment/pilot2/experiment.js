@@ -26,19 +26,27 @@ const Experiment = (() => {
         },
         demographics: {},
         design: null,
-        trials: [],
+        trials: [], // part 1, size task
+        depth_trials: [], // part 2, depth task
     }
     let trials = []
+    let depthTrials = []
     let canvasSize = { width: 800, height: 600 }
 
     // A test run (`?test` in the URL, or the page opened from disk or a local server) is saved like
     // any other, but under a name starting `test_` and with `test: true` in the session, so it can
     // be told apart from participants' data (data/download.py counts it separately)
+    // `?part=2` skips consent, demographics and the size task and starts at the depth task, for
+    // checking part 2 without doing part 1 first. It always counts as a test run.
+    const urlParams = new URLSearchParams(location.search)
+    const startPart = urlParams.get("part") === "2" ? 2 : 1
     const isTest =
-        new URLSearchParams(location.search).has("test") ||
+        urlParams.has("test") ||
+        startPart === 2 ||
         location.protocol === "file:" ||
         ["localhost", "127.0.0.1", ""].includes(location.hostname)
     log.session.test = isTest
+    log.session.start_part = startPart
 
     // Whether the device *can* take touch (logged as `touch_device`). Not used for the wording: it is
     // also true of touchscreen laptops, whose users have a keyboard and use it.
@@ -66,8 +74,10 @@ const Experiment = (() => {
     // --- Responses: keyboard and touch ----------------------------------------------------------
     // `keys` are KeyboardEvent.code values ("ArrowLeft", "Space"); event.key is accepted as well.
     // With `touch`, a tap on the left half of the screen counts as ArrowLeft, on the right half as
-    // ArrowRight, and any tap counts as Space when Space is the only key expected.
-    const KEY_ALIASES = { " ": "Space", Spacebar: "Space", Left: "ArrowLeft", Right: "ArrowRight" }
+    // ArrowRight, and any tap counts as Space when Space is the only key expected. An on-screen
+    // button with a `data-key` attribute counts as that key; in the depth task (ArrowDown expected)
+    // a tap only counts on such a button, since half-screens cannot give three answers.
+    const KEY_ALIASES = { " ": "Space", Spacebar: "Space", Left: "ArrowLeft", Right: "ArrowRight", Up: "ArrowUp", Down: "ArrowDown" }
 
     function waitForResponse(keys, touch = true) {
         return new Promise((resolve) => {
@@ -88,7 +98,12 @@ const Experiment = (() => {
                 if (!touch) return
                 if (event.pointerType === "mouse" && event.button !== 0) return
                 let key
-                if (keys.length === 1 && keys[0] === "Space") {
+                const button = event.target.closest?.("[data-key]")
+                if (button) {
+                    key = button.dataset.key
+                } else if (keys.includes("ArrowDown")) {
+                    return
+                } else if (keys.length === 1 && keys[0] === "Space") {
                     key = "Space"
                 } else {
                     key = event.clientX < window.innerWidth / 2 ? "ArrowLeft" : "ArrowRight"
@@ -178,13 +193,12 @@ const Experiment = (() => {
     }
 
     // --- Mask: achromatic dynamic noise over each panel, to cut the colour afterimage -------------
-    // Two noise squares at exactly the positions and sizes of the two panels just shown; the rest of
-    // the canvas is the background.
-    async function showMask(canvas, params) {
+    // Noise squares at exactly the positions and sizes of the panels just shown (both, unless `rects`
+    // gives others); the rest of the canvas is the background.
+    async function showMask(canvas, params, rects = Chromostereopsis.panelRects(params)) {
         const m = DESIGN.mask
         if (!m || m.duration <= 0) return 0
         const ctx = canvas.getContext("2d")
-        const rects = Chromostereopsis.panelRects(params)
         const size = rects[0].size
         const cols = Math.ceil(size / m.cell)
         const image = ctx.createImageData(size, size)
@@ -250,6 +264,7 @@ const Experiment = (() => {
 
         const correctResponse = params.Difference > 0 ? "ArrowLeft" : "ArrowRight"
         log.trials.push({
+            task: "size",
             order: trial.trial,
             set: trial.set,
             block: trial.block,
@@ -298,6 +313,100 @@ const Experiment = (() => {
                 show("screen-trial")
             }
         }
+    }
+
+    // --- Part 2: depth task --------------------------------------------------------------------
+    // One panel at a time, centred: a disc on its surround. "Which looks nearer, the circle or the
+    // surrounding area?": circle, surround or no difference. No correct answer and no time limit: the stimulus
+    // stays until the response.
+    //
+    // The panel shown is always the left panel of the usual two-panel stimulus, so the signed
+    // strength gives the disc's colour: positive = red-leaning disc on a blue-leaning surround,
+    // negative = blue-leaning disc on red-leaning, 0 = disc and surround the same purple. The full
+    // stimulus is drawn as usual (so it re-renders from its Seed) and only that panel is copied to the
+    // centre of the canvas.
+    const DEPTH_ANSWERS = { ArrowLeft: "circle", ArrowRight: "surround", ArrowDown: "none" }
+    const DEPTH_PANEL = "Left"
+
+    // Which colour the answer says is nearer: the disc's colour if the circle is nearer, the
+    // surround's if the surround is. At strength 0 both are the same purple (null).
+    function nearerColor(strength, answer) {
+        if (answer === "none") return "none"
+        if (strength === 0) return null
+        const discRed = strength > 0 // the left panel's disc is red-leaning when strength > 0
+        return (answer === "circle") === discRed ? "red" : "blue"
+    }
+
+    // Draw the full stimulus off screen and copy one panel to the centre of `canvas`. Returns the
+    // panel's rectangle on `canvas` (for the mask).
+    const offscreen = document.createElement("canvas")
+    function drawSinglePanel(canvas, params, side) {
+        Chromostereopsis.draw(offscreen, params)
+        const rect = Chromostereopsis.panelRects(params).find((r) => r.side === side)
+        canvas.width = params.Width
+        canvas.height = params.Height
+        const ctx = canvas.getContext("2d")
+        ctx.fillStyle = "rgb(" + params.Color_Background.join(",") + ")"
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        const x = Math.floor((canvas.width - rect.size) / 2)
+        ctx.drawImage(offscreen, rect.x, rect.y, rect.size, rect.size, x, rect.y, rect.size, rect.size)
+        return { side: side, x: x, y: rect.y, size: rect.size }
+    }
+
+    async function runDepthTrial(trial, total) {
+        const fixation = document.getElementById("fixation")
+        const canvas = document.getElementById("stimulus")
+        setProgress(trial.trial - 1, total)
+
+        canvas.style.visibility = "hidden"
+        fixation.style.visibility = "visible"
+        const isi = randomInteger(DESIGN.fixation_duration[0], DESIGN.fixation_duration[1])
+        const fixationOnset = await nextPaint()
+        const params = Chromostereopsis.parameters(trial.options)
+        const rect = drawSinglePanel(canvas, params, DEPTH_PANEL)
+        const renderTime = performance.now() - fixationOnset
+        await sleep(Math.max(0, isi - renderTime))
+
+        fixation.style.visibility = "hidden"
+        canvas.style.visibility = "visible"
+        const onset = await nextPaint()
+        const response = await waitForResponse(Object.keys(DEPTH_ANSWERS))
+        const maskDuration = await showMask(canvas, params, [rect])
+        canvas.style.visibility = "hidden"
+        setProgress(trial.trial, total)
+
+        const answer = DEPTH_ANSWERS[response.key]
+        const strength = params.Illusion_Strength
+        log.depth_trials.push({
+            task: "depth",
+            order: trial.trial,
+            isi: isi,
+            render_time: Math.round(renderTime * 100) / 100,
+            stimulus_onset: Math.round(onset),
+            panel_shown: DEPTH_PANEL, // the panel of the two-panel stimulus shown, centred
+            disc_color: strength > 0 ? "red" : strength < 0 ? "blue" : "purple",
+            response: response.key,
+            depth_answer: answer, // "circle", "surround" or "none" (no difference)
+            nearer_color: nearerColor(strength, answer), // "red", "blue", "none", or null at strength 0
+            response_modality: response.modality,
+            response_x: response.x ?? null,
+            response_y: response.y ?? null,
+            rt: Math.round((response.time - onset) * 100) / 100,
+            mask_duration: maskDuration,
+            parameters: params,
+        })
+        stage("depth_trial", log.depth_trials[log.depth_trials.length - 1])
+        await sleep(200)
+    }
+
+    async function runDepth() {
+        show("screen-depth-instructions")
+        await new Promise((resolve) => (document.getElementById("depth-button").onclick = resolve))
+        show("screen-trial")
+        document.getElementById("progress-label").textContent = "Part 2"
+        document.getElementById("depth-responses").style.display = "flex"
+        for (const trial of depthTrials) await runDepthTrial(trial, depthTrials.length)
+        document.getElementById("depth-responses").style.display = "none"
     }
 
     // --- Saving to Zenodo, through DataPipe (pipe.jspsych.org) -----------------------------------
@@ -394,9 +503,10 @@ const Experiment = (() => {
         return log.session
     }
 
-    // Flat version: one row per trial, session and demographics repeated, parameters spread out
+    // Flat version: one row per trial of either task (column `task`), session and demographics
+    // repeated, parameters spread out
     function flatRows() {
-        return log.trials.map((t) => {
+        return log.trials.concat(log.depth_trials).map((t) => {
             const row = Object.assign({}, log.session, log.demographics)
             for (const [key, value] of Object.entries(t)) {
                 if (key === "parameters") {
@@ -464,23 +574,41 @@ const Experiment = (() => {
             drawExamples()
             show("screen-instructions")
         }
-        document.getElementById("instructions-button").onclick = async () => {
+        const begin = async () => {
             fitCanvas()
             trials = makeTrials(DESIGN, canvasSize.width, canvasSize.height)
+            // Test runs only: `?size=`, `?gap=`, `?density=` or `?equiluminant=` override part 2's
+            // stimulus, for trying settings by eye (e.g. index.html?part=2&size=1.2&gap=0). A varied
+            // factor (e.g. size) is then held at that one value, so there are fewer trials.
+            if (isTest) {
+                for (const key of ["size", "gap", "density", "equiluminant"]) {
+                    if (!urlParams.has(key)) continue
+                    const raw = urlParams.get(key)
+                    const value = raw === "true" ? true : raw === "false" ? false : Number(raw)
+                    if (DEPTH_DESIGN.factors[key]) DEPTH_DESIGN.factors[key] = [value]
+                    else DEPTH_DESIGN.fixed[key] = value
+                }
+            }
+            depthTrials = makeDepthTrials(DEPTH_DESIGN, DESIGN, canvasSize.width, canvasSize.height)
             log.design = { n_sets: DESIGN.n_sets, n_per_set: DESIGN.n_per_set, n_total: DESIGN.n_total,
                 n_blocks: DESIGN.n_blocks, difference: DESIGN.difference,
                 illusion_strength: DESIGN.illusion_strength, factors: DESIGN.factors, fixed: DESIGN.fixed,
-                fixation_duration: DESIGN.fixation_duration, mask: DESIGN.mask }
+                fixation_duration: DESIGN.fixation_duration, mask: DESIGN.mask,
+                depth: Object.assign({ n_total: depthTrials.length }, DEPTH_DESIGN) }
+            document.getElementById("n-depth-trials").textContent = depthTrials.length
             openSession()
-            await runBlocks()
+            if (startPart === 1) await runBlocks()
+            await runDepth()
             finish()
         }
+        document.getElementById("instructions-button").onclick = begin
         document.getElementById("n-trials").textContent = DESIGN.n_total
         document.getElementById("n-blocks").textContent = DESIGN.n_blocks
-        show("screen-consent")
+        if (startPart === 2) begin()
+        else show("screen-consent")
     }
 
-    return { start, log, get isTouch() { return isTouch }, get trials() { return trials } }
+    return { start, log, get isTouch() { return isTouch }, get trials() { return trials }, get depthTrials() { return depthTrials } }
 })()
 
 document.addEventListener("DOMContentLoaded", Experiment.start)

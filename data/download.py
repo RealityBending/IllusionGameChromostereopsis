@@ -36,7 +36,8 @@ narrowest that can read a draft; it can also write, so rotate it when the study 
     <the same name without .json>-<id>.partial.json    someone who stopped partway
 
 A partial is a bare JSON array of the records staged during the session: one `"record":
-"frame"` (session, demographics, design) followed by one `"record": "trial"` per trial.
+"frame"` (session, demographics, design) followed by one `"record": "trial"` per trial
+(pilot 2 also stages its depth task's trials, as `"record": "depth_trial"`).
 Past 80 files in a deposit, DataPipe packs the older ones into `datapipe-batch-NNNN.zip`;
 those are unpacked here as they arrive, so `raw/` always holds sessions, not archives.
 
