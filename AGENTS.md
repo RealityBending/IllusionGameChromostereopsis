@@ -212,9 +212,9 @@ measures (e.g. vernier alignment for chromatic aberration).
 
 It is not a replacement for the size task but does two things:
 
-1. **Classifies each participant** as red nearer, blue nearer or no depth (plus how consistent
-   they are): a grouping for the size analysis, so opposite effects are not averaged out, and a
-   count of interest in itself.
+1. **Classifies each participant** as red nearer, blue nearer, no depth or unclear (conservative;
+   cut-offs set from the part 2 answers before looking at the size data): a grouping for looking at
+   the size bias, so opposite effects are not averaged out, and a count of interest in itself.
 2. **Could test stimulus factors as moderators of the depth seen.** Not in pilot 2, which keeps
    part 2 short and solid (no dither); in the main experiment, part 2 can use whichever dither gives
    the strongest effect in part 1.
@@ -226,16 +226,19 @@ cause is optical.
 
 1. **Direct depth judgement after the size task** (chosen for pilot 2). One panel at a time,
    centred: "which looks nearer, the circle or the surrounding area?", answered circle, surround or no
-   difference (10-20% of observers see no depth, so a forced two-way choice would hide them). A
+   difference (10-20% of observers see no depth, and on purple trials circle and surround are the
+   same colour; a forced two-way choice would hide no-depth observers and force a guess on purple
+   trials). A
    first version showed both panels and asked which circle was nearer, but two discs cannot be
    fixated at once, which made it hard to judge. Figures tend to look in front of their ground
    anyway, so the measure is the difference between red discs and blue discs; strength 0 trials
    (disc and surround the same purple) measure that figure-in-front bias. Participants are asked
    about the "surrounding area" (button: "Surround nearer"), not the "background", which already
    implies behind. Only full-strength red and blue discs and strength 0 are shown, solid (density 1, no
-   dither), with no outline, and disc size varied (0.5, 0.75, 1; not planned as a test) so the
-   classification does not depend on one size: the task only has to classify each participant, so the lower
-   strengths, dither and `outline` are left to the size task. Run **after** the size task so that the size
+   dither) and with no outline: the task only has to classify each participant, so the lower
+   strengths, dither and `outline` are left to the size task. Disc size varies (0.5, 0.75, 1) so
+   that fewer trials are identical repeats; there are likely too few trials per size to test a
+   difference between sizes. Run **after** the size task so that the size
    judgements are made before participants know the study is about depth. A few minutes.
    Weaknesses: subjective, open to demand effects, and "which is nearer" on a flat screen is an odd
    question, so some will guess.

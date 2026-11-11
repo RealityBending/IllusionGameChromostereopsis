@@ -6,7 +6,7 @@ The main task, run first in the [pilot 2](../README.md) session, before
 ## Aim
 
 Part 1 measures the **size bias**: whether a red disc (on blue) is judged larger or smaller than an
-equally sized blue disc (on red). Two questions about the disc's texture:
+equally sized blue disc (on red). Two questions about how the disc is drawn:
 
 - **Does dither density change the size bias?** Density 0.1, 0.5 and 1 (solid).
 - **Does the coloured outline (`outline`) change the size bias on its own?** The outline is there so
@@ -67,6 +67,20 @@ luminance covariates).
 
 ## Analysis
 
-Adapt `analysis/pilot1/analysis.qmd` into `analysis/pilot2/`: test `Density`, `Outline` and their
-interaction instead of pilot 1's six factors. Group participants by their part 2 classification
-(red nearer, blue nearer, no depth), so that opposite size biases are not averaged out.
+Adapt `analysis/pilot1/analysis.qmd` into `analysis/pilot2/`. As in pilot 1, the size bias is the
+effect of `Illusion_Strength` in the mixed logistic model of responses, and a factor moderates it
+if it interacts with `Illusion_Strength`.
+
+- **Dither density and coloured outline.** Density and outline are not fully crossed (no density 0.1
+  without the outline; at density 1 the outline is invisible), so do not fit a `Density` x `Outline`
+  interaction. Instead, test the 5 combinations as one factor (`Illusion_Strength` x combination),
+  and use targeted comparisons:
+  - density without the outline: 0.5 vs 1;
+  - density with the outline: 0.1 vs 0.5 vs 1;
+  - outline vs no outline: at density 0.5 only.
+
+  Density 1 with and without the outline are identical images, so they should not differ (a sanity
+  check, not a test).
+- **Depth class from part 2.** Compare the size bias between the [part 2](../part2_depth/README.md#analysis)
+  classes descriptively, e.g. each participant's size-bias slope (as extracted in pilot 1) plotted by
+  class. The classes will be too small to test. Exploratory.

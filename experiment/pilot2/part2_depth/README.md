@@ -1,8 +1,7 @@
 # Pilot 2, part 2: depth task
 
 New in pilot 2. Runs straight after [part 1](../part1_size/README.md) in the same session, so depth
-can be linked to size. Try it alone with `index.html?part=2` (skips everything before it; saved as a
-test).
+can be linked to size. Try it alone with `index.html?part=2`.
 
 ## Aim
 
@@ -28,7 +27,8 @@ fixated at once.) Which looks nearer, the circle or the surrounding area?
 | surround | <kbd>&rarr;</kbd> | Surround nearer |
 
 - On touch screens only the buttons count: half-screen taps cannot give three answers.
-- "No difference" is there because 10-20% of observers see no depth.
+- "No difference" is there for two reasons: 10-20% of observers see no depth, and on purple trials
+  the circle and surround are the same colour, so there is no colour difference to see depth in.
 - "Surrounding area" (button: "Surround nearer"), not "background", which implies behind.
 - No time limit: the stimulus stays until the response, then the 500 ms mask. RT is recorded
   (e.g. to spot answers given without looking). The instructions do not mention time.
@@ -40,9 +40,8 @@ fixated at once.) Which looks nearer, the circle or the surrounding area?
 colour: + red on blue, - blue on red, 0 all purple.
 
 48 trials, solid (density 1, no dither), no outline, otherwise as part 1. Disc size varies: 0.5
-(as part 1), 0.75 and 1. Tried by eye, a small disc tends to look in front whatever its colour and
-a large one lets the surround win, so varying it keeps the classification from depending on one
-size. Size is not planned as a test, though it can be looked at descriptively.
+(as part 1), 0.75 and 1, so that fewer trials are identical repeats. There are likely too few
+trials per size to test a difference between sizes.
 
 Test runs can override `size`, `gap`, `density` or `equiluminant` in the URL, e.g.
 `index.html?part=2&size=0.75&gap=0` (a varied factor is then held at that value).
@@ -80,6 +79,20 @@ chosen on purple), `rt`, `panel_shown`, timing, response modality and `parameter
 
 ## Analysis
 
-Depth direction per participant: share of "circle nearer" on red discs minus on blue discs (cancels
-the figure-in-front bias). Classify as red nearer, blue nearer or no depth with a binomial test.
-Report the counts, and use the grouping in the part 1 size analysis.
+Classify each participant from their 42 red and blue disc trials. An answer **points to red** if it
+is "circle nearer" on a red disc or "surround nearer" on a blue disc, and **points to blue** the
+other way round. Someone who always answers "circle" points to red and blue equally, so the
+figure-in-front bias does not decide the class.
+
+- **Red nearer**: clearly more answers point to red than to blue.
+- **Blue nearer**: the reverse.
+- **No depth**: mostly "No difference".
+- **Unclear**: anything else.
+
+Keep it conservative and put anyone borderline in Unclear. Choose the cut-offs from the part 2
+answers alone and record them before comparing the classes on the
+part 1 size data. Optionally, check that a slightly stricter and a slightly looser cut-off give
+similar results. Report the counts in each class.
+
+Checks: on purple trials, the share of "circle nearer" and of "No difference" (whether the task was
+understood); very fast answers (e.g. under ~300 ms), possibly given without looking.

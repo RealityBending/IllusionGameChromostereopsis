@@ -14,9 +14,8 @@
 // the strength is the disc's colour (positive = red disc on blue). Dither is not varied here: in the
 // main experiment, part 2 can use whichever dither gives the strongest effect in part 1.
 //
-// Disc size varies (0.5, 0.75, 1; part 1 uses 0.5), so the classification does not depend on one
-// size: tried by eye, a small disc tends to look in front whatever its colour, a large one tends to
-// let the surround win. Size is not planned as a test, though it can be looked at descriptively.
+// Disc size varies (0.5, 0.75, 1; part 1 uses 0.5), so that fewer trials are identical repeats.
+// There are likely too few trials per size to test a difference between sizes.
 //
 // 21 red + 21 blue discs to classify each participant's depth direction. Strength 0 gives the
 // figure-in-front bias, which the red vs blue comparison already cancels, so it is only a check and
