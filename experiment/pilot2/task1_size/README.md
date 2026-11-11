@@ -71,11 +71,9 @@ luminance covariates).
 
 ## Analysis
 
-The pilot is for checking that the task works and for planning the main experiment, not for
-significance tests: describe and estimate (with intervals), do not test. Adapt
-`analysis/pilot1/analysis.qmd` into `analysis/pilot2/`. As in pilot 1, the size bias is the effect
-of `Illusion_Strength` in a mixed logistic model of responses (left vs right larger, with
-`difference` in the model).
+Estimates with intervals (bootstrap, as in pilot 1), no significance tests. The size bias is the
+`Illusion_Strength` effect in pilot 1's core model (a mixed logistic model of left/right responses,
+with `difference`), in `analysis/pilot1/analysis.qmd`.
 
 1. **Data quality and engagement**, first. Partial sessions are left out, as in pilot 1 (they are
    most likely test runs of the pilot). Pilot 1 reported each participant's accuracy, median RT and
