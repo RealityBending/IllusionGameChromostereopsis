@@ -8,13 +8,21 @@ and blue on black, most observers report red as nearer; a minority report the re
 offset of the fovea from the optical axis, with brightness as an extra cue (red is about 3x
 brighter than blue in sRGB).
 
-Depth on a flat image has no ground truth, but size does, so this study measures size judgements:
+Depth on a flat image has no ground truth, but size does, so this study measures size judgements.
+The main question:
+
+> Does chromostereopsis bias size judgements and, if so, in which direction and under which stimulus
+> conditions?
+
+The study is framed as a **viability screening** (not effect estimation): whether a size-based task
+could provide an objective measure of chromostereopsis, as a possible first step towards paradigms
+such as the Illusion Game.
 
 > **Primary:** does the perceived depth from chromostereopsis carry over into size judgements and,
 > if so, in which direction?
 >
-> **Secondary:** develop an online method for measuring the effect of chromostereopsis on size
-> judgements.
+> **Secondary:** develop and evaluate an online method for measuring the effect of chromostereopsis
+> on size judgements.
 
 Two accounts predict **opposite** directions:
 
@@ -26,8 +34,19 @@ Pilot 1 tested irradiation by varying `equiluminant`. From pilot 2 the colours a
 equiluminant, which removes the brightness difference irradiation depends on, so it is controlled
 rather than tested and is no longer a focus.
 
-The study is screening, not effect estimation, and does not assess Illusion Game suitability (see
-**Limitation: optics vs perception**).
+Viability would be suggested, tentatively, if:
+
+1. size judgements are biased by illusion strength, beyond chance, across the sample;
+2. the direction of the bias is reasonably consistent within participants (e.g. across the two halves
+   of the session);
+3. the bias is detectable at feasible trial numbers, in particular at the smaller size differences;
+4. the bias differs with each participant's perceived depth direction (the primary aim);
+5. some stimulus specifications bring out the effect more clearly than others.
+
+Pilots can only give a first indication on these. Even if they are met, any effect may reflect
+observers' optics as well as perception, which the present design is unlikely to be able to
+disentangle (see **Limitation: optics vs perception**). Viability here concerns the task as a
+measurement, not the mechanism behind it.
 
 ## The three pieces
 
@@ -214,9 +233,11 @@ measures (e.g. vernier alignment for chromatic aberration).
 
 It is not a replacement for the size task but does two things:
 
-1. **Classifies each participant** as red nearer, blue nearer, no depth or unclear (conservative;
-   cut-offs set from the task 2 answers before looking at the size data): a grouping for looking at
-   the size bias, so opposite effects are not averaged out, and a count of interest in itself.
+1. **Classifies each participant's current depth percept** (red nearer, blue nearer, no depth or
+   unclear), to be matched with their size bias so that opposite effects are not averaged out.
+   Perceived depth likely depends on the screen, lighting and viewing distance, so it is measured in
+   the same session and conditions as the size task, not treated as a fixed trait; nor are the class
+   counts an estimate of how common each percept is.
 2. **Could test stimulus factors as moderators of the depth seen.** Not in pilot 2, which keeps
    task 2 short and solid (no dither); in the main experiment, task 2 can use whichever dither gives
    the strongest effect in task 1.
@@ -228,19 +249,12 @@ cause is optical.
 
 1. **Direct depth judgement after the size task** (chosen for pilot 2). One panel at a time,
    centred: "which looks nearer, the circle or the surrounding area?", answered circle, surround or no
-   difference (10-20% of observers see no depth; a forced two-way choice would hide them). A
-   first version showed both panels and asked which circle was nearer, but two discs cannot be
-   fixated at once, which made it hard to judge. Figures tend to look in front of their ground
-   anyway, so the measure is the difference between red discs and blue discs, which cancels that
-   figure-in-front bias. Participants are asked
-   about the "surrounding area" (button: "Surround nearer"), not the "background", which already
-   implies behind. Only full-strength red and blue discs are shown, solid (density 1, no dither), with no
-   outline and task 1's thin gap of 0.01 (no gap looked clearer than 0.02 but may show a purple seam from
-   the display where red meets blue; purple, strength 0, trials were dropped while the gap was 0): the task only has to classify each participant, so the lower
-   strengths, dither and `outline` are left to the size task. Disc size varies (0.5, 1) so
-   that a colour can repeat without repeating the same image; there are too few trials per size to
-   test a difference between sizes. 24 trials (48, with purple trials, took about 8 minutes). Run **after** the size task so that the size
-   judgements are made before participants know the study is about depth. A few minutes.
+   difference (10-20% of observers see no depth; a forced choice would hide them). Showing both panels
+   was hard to judge, as two discs cannot be fixated at once. Figures tend to look in front of their
+   ground, so the measure is the difference between red and blue discs, which cancels that bias.
+   Full-strength, solid discs only, as the task only has to classify each participant. Run **after**
+   the size task, so that size judgements are made before participants know the study is about
+   depth. About 5 minutes. Design details: `experiment/pilot2/task2_depth/README.md`.
    Weaknesses: subjective, open to demand effects, and "which is nearer" on a flat screen is an odd
    question, so some will guess.
 2. **Nulling by colour adjustment** (not yet implemented). Participants adjust the colour balance of
@@ -254,9 +268,8 @@ stimulus), and artificial pupils, which reverse the effect in many observers.
 ## Status
 
 - **Pilot 1** is finished: 15 participants, written up in `analysis/pilot1/pilot_analysis.pdf`.
-- **Pilot 2** is in design: size task plus a short depth task (task 2); changes listed in
-  `experiment/pilot2/README.md`; check stimuli with
-  `experiment/pilot2/task1_size/stimuli.html` and `task2_depth/stimuli.html`. No DataPipe experiment yet (`DATAPIPE_EXPERIMENT = ""`).
+- **Pilot 2** is in design: size task plus a short depth task; see `experiment/pilot2/README.md`.
+  No DataPipe experiment yet (`DATAPIPE_EXPERIMENT = ""`).
 - **Main study**: add age back to the demographics (dropped for pilot 2, too few participants to
   analyse it). Sex is not collected: there is no known evidence that it moderates chromostereopsis
   (outside of the prevalence of colour vision differences, which are recorded), and it is not a

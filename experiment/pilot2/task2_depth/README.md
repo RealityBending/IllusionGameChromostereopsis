@@ -1,17 +1,16 @@
 # Pilot 2, task 2: depth task
 
-New in pilot 2. Runs straight after [task 1](../task1_size/README.md) in the same session, so depth
-can be linked to size. Try it alone with `index.html?task=2`.
+New in pilot 2. Runs straight after [task 1](../task1_size/README.md) in the same session. Try it
+alone with `index.html?task=2`.
 
 ## Aim
 
-**Classify each participant** as red nearer, blue nearer, or no depth: a grouping for the size
-analysis, and a count of interest in itself.
+**Classify each participant's current depth percept** (red nearer, blue nearer or no depth), under
+the same viewing conditions as their size judgements in task 1, so that the two can be matched.
+Perceived depth likely depends on the screen, lighting and viewing distance, so it is measured in
+the same session rather than treated as a fixed trait.
 
-Kept short, with no dither. Dither is tested in task 1; in the main (non-pilot) experiment, task 2
-can use whichever dither gives the strongest effect there.
-
-A depth report has no correct answer, so it cannot replace the size task. It comes after it so the
+A depth report has no correct answer, so it cannot replace the size task. It comes after it, so that
 size judgements are made before participants know the study is about depth. Rationale and other
 options: [`AGENTS.md`](../../../AGENTS.md#measuring-perceived-depth).
 
@@ -39,10 +38,9 @@ fixated at once.) Which looks nearer, the circle or the surrounding area?
 colour: + red on blue, - blue on red.
 
 24 trials, solid (density 1, no dither), no outline, otherwise as task 1 (gap 0.01). Disc size
-varies: 0.5 (as task 1) and 1, so that a colour can come up twice in a row without repeating the
-same image (with one size, the no-repeat rule would force red and blue to alternate, a pattern
-participants could answer by). Too few trials per size to compare sizes. Cut from 48 trials
-(sizes 0.5, 0.75, 1 x 7 red + 2 purple + 7 blue), which took about 8 minutes.
+varies (0.5, as task 1, and 1) so that a colour can come up twice in a row without repeating the same
+image; with one size, red and blue would have to alternate. Too few trials per size to compare
+sizes. Cut from 48 trials (with purple), which took about 8 minutes.
 
 Test runs can override `size`, `gap`, `density` or `equiluminant` in the URL, e.g.
 `index.html?task=2&size=0.75&gap=0` (a varied factor is then held at that value).
@@ -52,13 +50,11 @@ Test runs can override `size`, `gap`, `density` or `equiluminant` in the URL, e.
 | Red disc on blue (+1) | 6 |
 | Blue disc on red (-1) | 6 |
 
-- **Full strength only**: it classifies best; lower strengths, dither and `outline` are left to
-  task 1.
-- **Trial count**: 24 red + blue trials (all sizes together) to classify each participant's depth
-  direction. Raise `n_reps` if participants turn out less consistent than hoped.
-- **No purple**: it measured the figure-in-front bias, only a check since the red vs blue
-  comparison cancels that bias. With no colour difference, the question means little to
-  participants.
+- **Full strength only, solid**: it classifies best; lower strengths and dither are left to task 1.
+  In the main experiment, task 2 can use whichever dither works best there.
+- **Trial count**: raise `n_reps` if participants turn out less consistent than hoped.
+- **No purple**: it only checked the figure-in-front bias, which the red vs blue comparison already
+  cancels, and with no colour difference the question means little to participants.
 
 ### Trial order
 
@@ -71,8 +67,9 @@ Random, with two rules (`orderDepthTrials()`):
 ## Data
 
 `depth_trials`, one entry per trial (`task: "depth"`): `disc_color` (`red`/`blue`),
-`depth_answer` (`circle`/`surround`/`none`), `nearer_color` (`red`/`blue`/`none`), `rt`, `panel_shown`, timing, response modality and `parameters`. Settings under
-`design.depth`; partial files stage these as `"record": "depth_trial"`.
+`depth_answer` (`circle`/`surround`/`none`), `nearer_color` (`red`/`blue`/`none`), `rt`,
+`panel_shown`, timing, response modality and `parameters`. Settings under `design.depth`; partial
+files stage these as `"record": "depth_trial"`.
 
 ## Analysis
 
@@ -86,10 +83,10 @@ figure-in-front bias does not decide the class.
 - **No depth**: mostly "No difference".
 - **Unclear**: anything else.
 
-Keep it conservative and put anyone borderline in Unclear. Choose the cut-offs from the task 2
-answers alone and record them before comparing the classes on the
-task 1 size data. Optionally, check that a slightly stricter and a slightly looser cut-off give
-similar results. Report the counts in each class. The classes are used in step 6 of the
+Keep it conservative: anyone borderline is Unclear. Choose the cut-offs from the task 2 answers alone
+and record them before looking at the task 1 data; optionally check that slightly stricter and looser
+cut-offs agree. Report the number in each class (to read the comparison, not as an estimate of how
+common each percept is). The classes are used in step 6 of the
 [task 1 analysis](../task1_size/README.md#analysis).
 
 Checks: the overall share of "circle nearer" (the figure-in-front bias, no longer measured on its

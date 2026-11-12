@@ -5,8 +5,8 @@
 // One panel at a time (the left panel of the usual stimulus, centred; see experiment.js): "which
 // looks nearer, the circle or the surrounding area?", answered circle, surround or no difference. A
 // depth report has no correct answer, so it does not replace the size task. It classifies each
-// participant as red nearer, blue nearer or no depth (a grouping for the size analysis, and a count
-// of interest in itself). Run after the size task so that the size judgements are made before
+// participant's current depth percept (red nearer, blue nearer or no depth) under the same viewing
+// conditions as their size judgements, so that the two can be matched. Run after the size task so that the size judgements are made before
 // participants know the study is about depth. Notes: AGENTS.md > Measuring perceived depth.
 //
 // Kept short and simple: full-strength red and blue discs only, solid (density 1, no dither), no

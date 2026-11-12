@@ -4,15 +4,23 @@ Chromostereopsis is the perception of depth between colours on a flat surface. F
 red and blue on black, most observers report red as nearer, although some report the reverse and
 some no depth.
 
-**Primary aim:** does the perceived depth from chromostereopsis carry over into **size** judgements
+**Main question:** does chromostereopsis bias **size** judgements and, if so, in which direction and
+under which stimulus conditions?
+
+The study is framed as a **viability screening**: whether a size-based task could provide an
+objective measure of chromostereopsis, as a possible first step towards paradigms such as the
+Illusion Game. Criteria: [`AGENTS.md`](AGENTS.md#aim).
+
+**Primary aim:** does the perceived depth from chromostereopsis carry over into size judgements
 and, if so, in which direction?
 
-**Secondary aim:** develop an online method for measuring the effect of chromostereopsis on size
-judgements.
+**Secondary aim:** develop and evaluate an online method for measuring the effect of
+chromostereopsis on size judgements.
 
 **Limitation:** chromostereopsis depends partly on each observer's eye optics, so any effect on size
-judgements likely combines optics and perception. This study cannot separate the two; that would
-likely need a lab study. Details and design rationale: [`AGENTS.md`](AGENTS.md#limitation-optics-vs-perception).
+judgements may reflect optics as well as perception. The present design is unlikely to separate the
+two; viability concerns the task as a measurement, not the mechanism. Details:
+[`AGENTS.md`](AGENTS.md#limitation-optics-vs-perception).
 
 ## Pilots
 

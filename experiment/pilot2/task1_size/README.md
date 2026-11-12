@@ -5,31 +5,28 @@ The main task, run first in the [pilot 2](../README.md) session, before
 
 ## Aim
 
-Task 1 measures the **size bias**: whether a red disc (on blue) is judged larger or smaller than an
-equally sized blue disc (on red). Aims:
+Task 1 measures the **size bias**: whether a red disc (on blue) is judged larger or smaller than a
+blue disc (on red). It is compared between task 2's depth classes for the pilot's primary aim
+([pilot 2](../README.md#aims)). Task 1's own aims:
 
 1. **Smaller size differences.** Adds 0.01 (pilot 1's smallest was 0.025), so that more trials sit
    near threshold.
 2. **Finer illusion strength.** 7 levels instead of 5.
-3. **Further testing of stimulus parameters.** Some are now fixed from pilot 1; others are retested
-   with changes in line with these: dither density, and a coloured outline (`outline`), which lets
-   low density be tested (below). **Still to choose** between option A (density 0.1, 0.5 and 1, with
-   and without the outline; what `design.js` runs now) and option B (density 0.2 to 1 in steps of
-   0.2, no outline): see [`density_options.md`](density_options.md).
+3. **Dither density, at a fixed dither size (4 px).** **Still to choose** between option A
+   (density 0.1, 0.5 and 1, with and without a coloured outline; what `design.js` runs now) and
+   option B (density 0.2 to 1 in steps of 0.2, no outline): [`density_options.md`](density_options.md).
 
-**Why the coloured outline:** it is there to make low-density dither usable at all. A sparsely
-dithered disc has no clear edge (at density 0.1, 9 in 10 cells are black), so its size cannot be
-judged. The coloured outline, in the disc's own colour, gives it a defined edge while the inside
-stays sparse. 
+**Why the coloured outline (option A):** a sparsely dithered disc has no clear edge, so its size
+cannot be judged. The outline, in the disc's own colour, gives it one while the inside stays sparse.
 
 ## Task
 
 As in [pilot 1](../../pilot1/README.md): two discs side by side, each on a surround of the other
-colour. Which is larger? <kbd>&larr;</kbd>/<kbd>&rarr;</kbd>, tap a half of the screen, or click the dim "Left larger" /
-"Right larger" buttons under the stimulus (a reminder of the keys, as in task 2), as fast as
-possible. 4 blocks with breaks. Unlike pilot 1, no accuracy or RT on the break screens: shown only
-on the end screen, so that participants do not change how they judge size to raise a score that the
-illusion lowers. The breaks do not mention blocks either.
+colour. Which is larger? <kbd>&larr;</kbd>/<kbd>&rarr;</kbd>, a tap on either half of the screen,
+or the dim "Left larger" / "Right larger" buttons under the stimulus (as in task 2), as fast as
+possible. 4 blocks with breaks. Unlike pilot 1, accuracy and RT are shown only on the end screen, not
+at breaks, so that participants do not change how they judge size to raise a score the illusion
+lowers.
 
 ## Design
 
@@ -45,25 +42,21 @@ even number of sets).
 
 **Density (0.1, 0.5, 1) x `outline` (0, 0.01: as wide as the gap)**, minus two combinations, leaving **4 distinct
 conditions**, balanced within each set (10 or 11 each, about 63 per session), not crossed with the
-grid. Logged as `Density` and `Outline`. **Provisional** until checked in
-[`stimuli.html`](stimuli.html), which still shows the excluded combinations, marked EXCLUDED. An
-alternative (density 0.2 to 1 in steps of 0.2, no outline) is set out in
-[`density_options.md`](density_options.md).
+grid. Logged as `Density` and `Outline`. This is option A; see aim 3. Preview, with excluded
+combinations marked: [`stimuli.html`](stimuli.html).
 
 | | No outline | Coloured outline (0.01) |
 | - | ---------- | ----------------------- |
 | Density 0.1 | excluded | yes |
 | Density 0.5 | yes | yes |
-| Density 1 | yes | excluded (same image) |
+| Density 1 | yes | excluded (repeat of density 1, no outline) |
 
 **Excluded**, at every strength:
 
-- **Density 0.1 without the coloured outline.** 9 in 10 dither cells are black, so the gap is lost
-  and the disc's edge is only where the dot colour changes, too ill-defined to judge size by (and
-  invisible at strength 0).
-- **Density 1 with the coloured outline.** The outline is invisible on a solid disc, so it is the
-  same image as density 1 without it. It is not repeated: density 1 serves as the solid reference
-  for both the with- and without-outline comparisons.
+- **Density 0.1 without the outline**: 9 in 10 cells are black, so the disc's edge is too
+  ill-defined to judge size by (and invisible at strength 0).
+- **Density 1 with the outline**: the outline is invisible on a solid disc, so this repeats density 1
+  without it, which serves as the solid reference for both outline levels.
 
 `outline` sits inside the disc's radius, so it does not change its size. Fixed settings: [pilot 2
 README](../README.md#shared-settings). Rationale for each factor: [`AGENTS.md`](../../../AGENTS.md).
@@ -93,6 +86,10 @@ with `difference`), in `analysis/pilot1/analysis.qmd`.
    picture.
 2. **Size bias: direction and rough size.** The `Illusion_Strength` estimate from the core model
    (as in pilot 1), with its interval.
+   - **Consistency within participants** (viability criterion 2 in
+     [`AGENTS.md`](../../../AGENTS.md#aim)): estimate each participant's bias separately in the first
+     and second half of the task (blocks 1-2 vs 3-4), and report how often the direction agrees.
+     With about 126 trials per half this is rough, so treat it as a first indication.
 3. **Does the bias grow with the colour separation?** The bias at each of the 7 strength levels,
    plotted (pilot 1 compared linear vs categorical strength).
 4. **Difficulty.** Error rate at each `difference` (as in pilot 1). New: is 0.01 above chance? If

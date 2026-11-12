@@ -9,32 +9,32 @@ folder's own code and designs, so they always show the current levels.
 
 ## Aims
 
-Task 1 (size):
+These follow the study's aims ([main README](../../README.md)), and give a first indication on its
+viability criteria ([`AGENTS.md`](../../AGENTS.md#aim)).
 
-1. **Smaller size differences**: add 0.01 (pilot 1's smallest was 0.025), so that more trials sit
-   near threshold, where a small colour bias should show most. Is 0.01 above chance?
-2. **Finer illusion strength**: 7 levels instead of 5, to see how the bias grows with colour
-   separation.
-3. **Further testing of stimulus parameters**: some are now fixed from pilot 1 (see
-   [Shared settings](#shared-settings)); others are retested with changes in line with these: dither
-   density, and a coloured outline that lets low density be tested. **Still to choose** between two
-   designs for these: see [`task1_size/density_options.md`](task1_size/density_options.md).
-
-Task 2 (depth):
-
-4. **Depth classification**: classify each participant as red nearer, blue nearer or no depth, and
-   link this to their size bias.
+1. **Primary: does the size bias depend on perceived depth?** Each participant's current depth
+   percept (task 2) is matched with their size bias (task 1), in the same session and viewing
+   conditions. Pilot 2 is the first to make this comparison.
+2. **Secondary, a more sensitive size task**: smaller size differences (0.01 added; pilot 1's
+   smallest was 0.025), so that more trials sit near threshold, where a small bias should show most;
+   and finer illusion strength (7 levels instead of 5).
+3. **Secondary, stimulus conditions: dither density at a fixed dither size**: most parameters are
+   now fixed from pilot 1 ([Shared settings](#shared-settings)), including dither size at 4 px, the
+   only factor with a tentative moderating effect in pilot 1 (weaker at 2 px; p = 0.07 after
+   correction). Density is tested at that size. As density 1 is solid, this also tests whether dither
+   matters at all (pilot 1 found no difference, but with dither size varying alongside). **Still to
+   choose** between two designs: [`task1_size/density_options.md`](task1_size/density_options.md).
 
 Practical: session length, data saving, and whether the instructions are followed.
 
 ## The session
 
-Two tasks in one session, so each participant's depth report can be linked to their size data:
+Two tasks in one session, so that depth and size are measured under the same viewing conditions:
 
 | Task | What | Trials | README |
 | ---- | ---- | ------ | ------ |
-| 1, size | Main task. Two discs side by side: which is larger? Adds smaller size differences and finer illusion strengths, and tests whether dither density and a coloured outline change the size bias. | 252 | [`task1_size/`](task1_size/README.md) |
-| 2, depth | One disc at a time: does the circle or the surrounding area look nearer? Classifies each participant (red nearer, blue nearer, no depth). Solid discs, no dither; disc size varies. | 24 | [`task2_depth/`](task2_depth/README.md) |
+| 1, size | Main task. Two discs side by side: which is larger? | 252 | [`task1_size/`](task1_size/README.md) |
+| 2, depth | One disc at a time: does the circle or the surrounding area look nearer? | 24 | [`task2_depth/`](task2_depth/README.md) |
 
 Flow: consent > demographics > task 1 instructions with two examples > 4 size blocks with breaks >
 task 2 instructions > depth trials > end screen (task 1 accuracy and RT; how often red or blue
@@ -60,7 +60,7 @@ Held fixed (`DESIGN.fixed`), in both tasks unless noted:
 | Fixed | Value |
 | ----- | ----- |
 | `equiluminant` | true |
-| `gap` | 0.01 (both tasks) |
+| `gap` | 0.01 |
 | `size` | 0.5 (task 2 varies it: 0.5, 1) |
 | `dither_size` | 4 px |
 | `size_panel` | fill |
@@ -70,22 +70,11 @@ rendering, so pilot 2 uses a thin 0.01 gap.
 
 ## Changes from pilot 1
 
-| | Pilot 1 | Pilot 2 |
-| - | ------- | ------- |
-| `difference` | 0.025 to 0.5 (5 levels) | 0.01 to 0.5 (6 levels) |
-| `illusion_strength` | -1 to 1 in 0.5 steps (5) | -1 to 1 in thirds (7) |
-| `equiluminant` | false, true | true |
-| `gap` | 0, 0.02, 0.06 | 0.01 |
-| `size` | 0.25, 0.5, 0.75 | 0.5 (task 2: 0.5, 1) |
-| `dither_size` | 2, 4, 8 | 4 |
-| `size_panel` | fill, "match" | fill |
-| `density` | 0.5, 0.75, 1 | 0.1, 0.5, 1, crossed with `outline`: 0.1 only with it, 1 only without (provisional; task 2: 1) |
-| `outline` | n/a | 0, 0.01 (as wide as the gap), crossed with `density` (provisional; task 2: none) |
-| Left/right larger | balanced within each strength level | also within each difference size |
-| Excluded combinations | strength 0 with gap 0 | density 0.1 without the outline; density 1 with it (same image) |
-| Trials | 10 sets of 25 = 250 | 6 sets of 42 = 252 |
-| Depth task | none | 24 trials after the size task |
-| Data file | `chromostereopsis_<start>_<id>.json` | `chromostereopsis_pilot2_<start>_<id>.json`, with `session.pilot = 2` |
+Parameter levels side by side: [main README](../../README.md#design-by-pilot). Also changed:
+
+- **Exclusions**: pilot 1 excluded strength 0 with gap 0; pilot 2 excludes density 0.1 without the
+  outline, and density 1 with it (a repeat of density 1 without).
+- **Data file**: `chromostereopsis_pilot2_<start>_<id>.json`, with `session.pilot = 2`.
 
 ## Data
 
@@ -108,8 +97,7 @@ The DataPipe client is vendored, not loaded from a CDN, so it cannot change duri
 
 ## Before collecting
 
-- Settle the `density` and `outline` levels from `task1_size/stimuli.html`, and check task 2's
-  stimuli in `task2_depth/stimuli.html`.
+- Choose density option A or B ([`task1_size/density_options.md`](task1_size/density_options.md)).
 - Decide whether task 2 keeps no time limit (the stimulus stays until the response; RT is recorded)
   or uses a fixed exposure.
 - Set up a new DataPipe experiment and Zenodo deposit: `DATAPIPE_EXPERIMENT` in `experiment.js`
@@ -119,11 +107,10 @@ The DataPipe client is vendored, not loaded from a CDN, so it cannot change duri
   (`https://realitybendinglab.com/IllusionGameChromostereopsis/experiment/pilot2/`, `?test` for a
   test run) here and in the main README's Pilots table.
 - Set up `analysis/pilot2/` (see each task's Analysis section).
-- Run through both tasks once (keyboard and touch): task 2 has not been run in a browser yet.
+- Run through both tasks on a touch screen (done on keyboard).
 
 ## Caveats
 
 As in pilot 1: chromostereopsis likely depends on the display, viewing distance and lighting, none
 of which are controlled online; they are recorded instead. The canvas fits the window, so retinal
-size varies with viewing distance. `dither_size` is in pixels, so its visual angle
-varies too.
+size varies with viewing distance. `dither_size` is in pixels, so its visual angle varies too.
