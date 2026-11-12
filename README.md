@@ -30,15 +30,15 @@ Add `?test` to a URL to try it without counting as data.
 | `difference` | 0.025 to 0.5 (5 levels) | 0.01 to 0.5 (6 levels) |
 | `illusion_strength` | -1 to 1 in 0.5 steps (5) | -1 to 1 in thirds (7) |
 | `equiluminant` | false, true | true |
-| `gap` | 0, 0.02, 0.06 | 0.02 |
-| `size` | 0.25, 0.5, 0.75 | 0.5 (depth task: 0.5, 0.75, 1) |
+| `gap` | 0, 0.02, 0.06 | 0.01 |
+| `size` | 0.25, 0.5, 0.75 | 0.5 (depth task: 0.5, 1) |
 | `dither_size` | 2, 4, 8 | 4 |
 | `size_panel` | fill, "match" | fill |
-| `density` | 0.5, 0.75, 1 | 0.1, 0.5, 1, crossed with `outline`: 0.1 only with it, 1 only without (provisional) |
-| `outline` | n/a | 0, 4 px, crossed with `density` (provisional) |
+| `density` | 0.5, 0.75, 1 | 0.1, 0.5, 1, crossed with `outline`: 0.1 only with it, 1 only without (provisional; depth task: 1) |
+| `outline` | n/a | 0, 0.01 (as wide as the gap), crossed with `density` (provisional; depth task: none) |
 | Left/right larger | balanced within each strength level | also within each difference size |
 | Trials | 10 sets of 25 = 250 | 6 sets of 42 = 252 |
-| Depth task | none | 48 trials after the size task, one disc at a time: "circle or surrounding area nearer?" |
+| Depth task | none | 24 trials after the size task, one disc at a time: "circle or surrounding area nearer?" |
 
 What each parameter does: [`AGENTS.md`](AGENTS.md#the-parameters). More on each pilot's changes:
 its `experiment/pilotN/README.md`.

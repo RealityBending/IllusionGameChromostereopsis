@@ -6,27 +6,30 @@ The main task, run first in the [pilot 2](../README.md) session, before
 ## Aim
 
 Task 1 measures the **size bias**: whether a red disc (on blue) is judged larger or smaller than an
-equally sized blue disc (on red). Two questions about how the disc is drawn:
+equally sized blue disc (on red). Aims:
 
-- **Does dither density change the size bias?** Density 0.1, 0.5 and 1 (solid).
-- **Does the coloured outline (`outline`) change the size bias on its own?** The outline is there so
-  that low density can be tested at all (below); this checks that it does not alter the size bias by
-  itself.
+1. **Smaller size differences.** Adds 0.01 (pilot 1's smallest was 0.025), so that more trials sit
+   near threshold.
+2. **Finer illusion strength.** 7 levels instead of 5.
+3. **Further testing of stimulus parameters.** Some are now fixed from pilot 1; others are retested
+   with changes in line with these: dither density, and a coloured outline (`outline`), which lets
+   low density be tested (below). **Still to choose** between option A (density 0.1, 0.5 and 1, with
+   and without the outline; what `design.js` runs now) and option B (density 0.2 to 1 in steps of
+   0.2, no outline): see [`density_options.md`](density_options.md).
 
 **Why the coloured outline:** it is there to make low-density dither usable at all. A sparsely
 dithered disc has no clear edge (at density 0.1, 9 in 10 cells are black), so its size cannot be
 judged. The coloured outline, in the disc's own colour, gives it a defined edge while the inside
-stays sparse. Low-density trials without it would not work, so **density 0.1 is only shown with the
-coloured outline**. The outline is invisible at density 1, so outline vs no outline can only be
-compared at density 0.5.
-
-Also: `illusion_strength` in finer steps (7 levels instead of 5), and a harder `difference` (0.01).
+stays sparse. 
 
 ## Task
 
 As in [pilot 1](../../pilot1/README.md): two discs side by side, each on a surround of the other
-colour. Which is larger? <kbd>&larr;</kbd>/<kbd>&rarr;</kbd> or tap a half of the screen, as fast as
-possible. 4 blocks with breaks.
+colour. Which is larger? <kbd>&larr;</kbd>/<kbd>&rarr;</kbd>, tap a half of the screen, or click the dim "Left larger" /
+"Right larger" buttons under the stimulus (a reminder of the keys, as in task 2), as fast as
+possible. 4 blocks with breaks. Unlike pilot 1, no accuracy or RT on the break screens: shown only
+on the end screen, so that participants do not change how they judge size to raise a score that the
+illusion lowers. The breaks do not mention blocks either.
 
 ## Design
 
@@ -40,12 +43,14 @@ So 36 trials per signed strength, 72 per colour pair. Which side is larger is ba
 strength of a set, each difference x strength cell, and each difference (`signPlan()`; needs an
 even number of sets).
 
-**Density (0.1, 0.5, 1) x `outline` (0, 4 px)**, minus two combinations, leaving **4 distinct
+**Density (0.1, 0.5, 1) x `outline` (0, 0.01: as wide as the gap)**, minus two combinations, leaving **4 distinct
 conditions**, balanced within each set (10 or 11 each, about 63 per session), not crossed with the
 grid. Logged as `Density` and `Outline`. **Provisional** until checked in
-[`stimuli.html`](stimuli.html), which still shows the excluded combinations, marked EXCLUDED.
+[`stimuli.html`](stimuli.html), which still shows the excluded combinations, marked EXCLUDED. An
+alternative (density 0.2 to 1 in steps of 0.2, no outline) is set out in
+[`density_options.md`](density_options.md).
 
-| | No outline | Coloured outline (4 px) |
+| | No outline | Coloured outline (0.01) |
 | - | ---------- | ----------------------- |
 | Density 0.1 | excluded | yes |
 | Density 0.5 | yes | yes |

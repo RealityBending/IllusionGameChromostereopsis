@@ -102,7 +102,7 @@ monotonic effect can be distinguished from a non-monotonic one.
 | ------ | ------ | --------------- |
 | `size` | 0.25, 0.5, 0.75 | Disc diameter, in Pyllusion grid units (sizes scale with the image height, `2` spanning it fully — so `0.25` is a 75 px disc on the default 800x600). Larger, centrally viewed patches are reported stronger; 0.25 is only the Delboeuf-matching default. |
 | `size_panel` | `null` (fill), `"match"` | How much surround there is. `null` = each panel fills its half, so the surround acts as the stimulus background and the two panels touch at the midline; `"match"` = the side at which disc and surround areas are equal (~1.36x the disc diameter), the only setting that removes the panel brightness imbalance *geometrically*. Logged as `Size_Panel_Mode`. |
-| `gap` | 0, 0.02, 0.06 | Width of the bare black annulus between disc and surround. A thin contrasting border is reported to be able to *flip* perceived depth order; `gap = 0` gives a bare red-blue edge at the disc. |
+| `gap` | 0, 0.02, 0.06 | Width of the bare black annulus between disc and surround. A thin contrasting border is reported to be able to *flip* perceived depth order; `gap = 0` gives a bare red-blue edge at the disc, which screens may show with a purple seam (pilot 2 uses 0.01). |
 | `density` | 0.5, 0.75, 1 | Proportion of dither cells that are coloured. 1 is a solid fill, i.e. the control for the pixel-art claim. Also a second, independent luminance knob: it scales a region's mean luminance without touching its pixel colours. |
 | `dither_size` | 2, 4, 8 | Dither cell side, **in pixels**. Chunky dither is anecdotally reported to strengthen the effect. Because it is a pixel quantity it does not scale with the image or the panel — `Dither_Cells_Across` is the scale-invariant number to hold constant when comparing across panel sizes. |
 | `equiluminant` | `false`, `true` | Scale the brighter colour down to the luminance of the dimmer one. Expected to *weaken* the depth, but it is the only way to attribute a size bias to colour rather than to brightness, so both levels are kept throughout. |
@@ -114,9 +114,9 @@ chromostereopsis; note that on black every colour has a Michelson contrast of 1,
 assignment is the only difference between them). One random `seed` per trial, logged.
 
 **`outline`** (pilot 2, not in Pyllusion): a solid coloured outline, in the disc's own colour, just inside its
-edge, in pixels (0 = none). It keeps the disc's edge, and so its size, defined when the disc is
+edge, in the same units as `gap` (0 = none). It keeps the disc's edge, and so its size, defined when the disc is
 sparsely dithered. It is invisible on a solid disc, so it only matters below `density = 1`; pilot 2
-crosses the two (0 and 4 px x density 0.1, 0.5, 1), minus two combinations (below), leaving 4
+crosses the two (0 and 0.01, as wide as the gap, x density 0.1, 0.5, 1), minus two combinations (below), leaving 4
 distinct conditions.
 
 **Excluded combinations**: pilot 1, `illusion_strength = 0` with `gap = 0` (same colour and no
@@ -228,19 +228,18 @@ cause is optical.
 
 1. **Direct depth judgement after the size task** (chosen for pilot 2). One panel at a time,
    centred: "which looks nearer, the circle or the surrounding area?", answered circle, surround or no
-   difference (10-20% of observers see no depth, and on purple trials circle and surround are the
-   same colour; a forced two-way choice would hide no-depth observers and force a guess on purple
-   trials). A
+   difference (10-20% of observers see no depth; a forced two-way choice would hide them). A
    first version showed both panels and asked which circle was nearer, but two discs cannot be
    fixated at once, which made it hard to judge. Figures tend to look in front of their ground
-   anyway, so the measure is the difference between red discs and blue discs; strength 0 trials
-   (disc and surround the same purple) measure that figure-in-front bias. Participants are asked
+   anyway, so the measure is the difference between red discs and blue discs, which cancels that
+   figure-in-front bias. Participants are asked
    about the "surrounding area" (button: "Surround nearer"), not the "background", which already
-   implies behind. Only full-strength red and blue discs and strength 0 are shown, solid (density 1, no
-   dither) and with no outline: the task only has to classify each participant, so the lower
-   strengths, dither and `outline` are left to the size task. Disc size varies (0.5, 0.75, 1) so
-   that fewer trials are identical repeats; there are likely too few trials per size to test a
-   difference between sizes. Run **after** the size task so that the size
+   implies behind. Only full-strength red and blue discs are shown, solid (density 1, no dither), with no
+   outline and task 1's thin gap of 0.01 (no gap looked clearer than 0.02 but may show a purple seam from
+   the display where red meets blue; purple, strength 0, trials were dropped while the gap was 0): the task only has to classify each participant, so the lower
+   strengths, dither and `outline` are left to the size task. Disc size varies (0.5, 1) so
+   that a colour can repeat without repeating the same image; there are too few trials per size to
+   test a difference between sizes. 24 trials (48, with purple trials, took about 8 minutes). Run **after** the size task so that the size
    judgements are made before participants know the study is about depth. A few minutes.
    Weaknesses: subjective, open to demand effects, and "which is nearer" on a flat screen is an odd
    question, so some will guess.
@@ -258,3 +257,7 @@ stimulus), and artificial pupils, which reverse the effect in many observers.
 - **Pilot 2** is in design: size task plus a short depth task (task 2); changes listed in
   `experiment/pilot2/README.md`; check stimuli with
   `experiment/pilot2/task1_size/stimuli.html` and `task2_depth/stimuli.html`. No DataPipe experiment yet (`DATAPIPE_EXPERIMENT = ""`).
+- **Main study**: add age back to the demographics (dropped for pilot 2, too few participants to
+  analyse it). Sex is not collected: there is no known evidence that it moderates chromostereopsis
+  (outside of the prevalence of colour vision differences, which are recorded), and it is not a
+  focus of this study.

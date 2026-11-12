@@ -49,7 +49,7 @@
             }
 
             const colorName = (s) => (s > 0 ? "red disc on blue" : s < 0 ? "blue disc on red" : "all purple")
-            const strengths = DEPTH_DESIGN.illusion_strength.slice().sort((a, b) => b - a) // red, purple, blue
+            const strengths = DEPTH_DESIGN.illusion_strength.slice().sort((a, b) => b - a) // red first
             const sizes = (DEPTH_DESIGN.factors.size || [DESIGN.fixed.size]).slice()
 
             // Rows = disc size, columns = disc colour
@@ -58,7 +58,7 @@
                 "beforeend",
                 "<h2>Disc colour x size</h2><p class='note'>Every condition in DEPTH_DESIGN: rows = disc size, " +
                     "columns = colour. Solid discs (density " + DEPTH_DESIGN.fixed.density + "), outline " +
-                    DEPTH_DESIGN.fixed.outline + "px.</p>"
+                    DEPTH_DESIGN.fixed.outline + ".</p>"
             )
             const grid = document.createElement("div")
             grid.className = "grid"

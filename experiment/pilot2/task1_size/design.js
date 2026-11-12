@@ -34,10 +34,10 @@ const DESIGN = {
     // Remaining stimulus factors, each with the levels to be balanced within a set. A level can also
     // be an object, which sets several options at once: that is how two factors are crossed rather
     // than balanced separately. Pilot 2 fixes all of pilot 1's factors but density, and crosses it
-    // with `outline`, a solid coloured outline in the disc's own colour at its edge (in pixels,
-    // 0 = none). Of the 6 combinations (`density_outline_all`), two are excluded (see `exclude`),
+    // with `outline`, a solid coloured outline in the disc's own colour at its edge (0 = none; 0.01
+    // = the same width as the black gap, `fixed.gap`, on any screen). Of the 6 combinations (`density_outline_all`), two are excluded (see `exclude`),
     // leaving 4 distinct conditions, balanced within each set of 42 (10 or 11 each).
-    density_outline_all: [0.1, 0.5, 1].flatMap((density) => [0, 4].map((outline) => ({ density, outline }))),
+    density_outline_all: [0.1, 0.5, 1].flatMap((density) => [0, 0.01].map((outline) => ({ density, outline }))),
     factors: {
         density_outline: null, // set below: density_outline_all minus the excluded combinations
     },
@@ -68,7 +68,7 @@ const DESIGN = {
         luminance2: 1,
         dither_shared: true,
         equiluminant: true,
-        gap: 0.02,
+        gap: 0.01, // may hide a purple seam that screens can show where red meets blue
         size: 0.5, // disc diameter (proportion of canvas height)
         dither_size: 4, // pixels
         size_panel: null, // surround fills its half

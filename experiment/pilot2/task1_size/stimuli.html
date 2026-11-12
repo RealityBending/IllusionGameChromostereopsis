@@ -13,6 +13,7 @@
             body { background: #222; color: #ddd; font-family: sans-serif; margin: 0; padding: 16px; }
             h2 { margin: 32px 0 4px; font-size: 18px; }
             p.note { margin: 0 0 12px; color: #999; font-size: 14px; }
+            a { color: #8ab4f8; }
             .grid { display: grid; gap: 12px; }
             figure { margin: 0; }
             canvas { width: 100%; height: auto; display: block; cursor: zoom-in; image-rendering: pixelated; }
@@ -23,6 +24,7 @@
     </head>
     <body>
         <h1>Pilot 2, task 1 (size) stimuli</h1>
+        <p class="note" id="option-note"></p>
         <p class="note">
             Drawn at 800 x 600 (Pyllusion's default) with seed 1. Images are scaled to fit, so dither may
             look finer than it is: click one to open it at full size. "panel ratio" is the predicted
@@ -32,10 +34,30 @@
         <script>
             const W = 800
             const H = 600
+
+            // ?option=b previews the alternative density design in density_options.md (density 0.2 to 1
+            // in steps of 0.2, no outline) instead of the one in design.js. Preview only: the task is unchanged.
+            const optionB = new URLSearchParams(location.search).get("option") === "b"
+            if (optionB) {
+                DESIGN.density_outline_all = [0.2, 0.4, 0.6, 0.8, 1].map((density) => ({ density, outline: 0 }))
+                DESIGN.exclude.push((o) => o.illusion_strength === 0 && o.density <= 0.4 && o.outline === 0)
+            }
+            document.getElementById("option-note").innerHTML = optionB
+                ? "Showing <b>option B</b> (density 0.2 to 1, no outline; see density_options.md). <a href='?'>Show the standard design</a>."
+                : "Showing the <b>standard design</b> (option A in density_options.md). <a href='?option=b'>Show option B</a>."
             const base = Object.assign({}, DESIGN.fixed, { width: W, height: H, seed: 1, difference: 0.1, illusion_strength: 1 })
             // All density x outline combinations, the excluded ones included (marked in their captions)
             const combos = DESIGN.density_outline_all
             Object.assign(base, combos.find((c) => c.outline > 0) || combos[0]) // sparsest density with the coloured outline
+
+            // Why a combination is excluded, very briefly (mirrors the rules in design.js and option B)
+            function excludedWhy(o) {
+                if (!isExcluded(DESIGN, o)) return ""
+                if (o.density === 1 && o.outline > 0) return "EXCLUDED: repeat of density 1, no outline"
+                if (o.density === 0.1 && o.outline === 0) return "EXCLUDED: too sparse to see the circle's edge"
+                if (o.illusion_strength === 0) return "EXCLUDED: circle not visible (all purple)"
+                return "EXCLUDED"
+            }
 
             function section(title, note, columns, cells) {
                 const root = document.getElementById("sections")
@@ -54,8 +76,8 @@
                         const params = Chromostereopsis.draw(canvas, Chromostereopsis.parameters(o))
                         caption.textContent =
                             "strength " + o.illusion_strength + " | diff " + o.difference + " | density " + o.density +
-                            " | outline " + o.outline + "px | panel ratio " + params.Luminance_Panel_Ratio.toFixed(2) +
-                            (isExcluded(DESIGN, o) ? " | EXCLUDED from the task" : "")
+                            " | outline " + o.outline + " | panel ratio " + params.Luminance_Panel_Ratio.toFixed(2) +
+                            (isExcluded(DESIGN, o) ? " | " + excludedWhy(o) : "")
                     } catch (error) {
                         caption.textContent = "error: " + error.message
                     }
@@ -72,16 +94,16 @@
             const outlines = [...new Set(combos.map((c) => c.outline))]
             section(
                 "Density x outline",
-                "All combinations: density (rows) against outline width in pixels (columns, 0 = no outline). Strength 1, difference 0.1. Red-framed ones are EXCLUDED from the task.",
-                outlines.length,
+                "All combinations: density (rows) against outline width (columns, 0 = no outline, 0.01 = as wide as the gap). Strength 1, difference 0.1. Red-framed ones are EXCLUDED from the task.",
+                outlines.length > 1 ? outlines.length : 3,
                 combos
             )
 
             // 2. Illusion strength, at each density x outline combination in DESIGN
             for (const combo of combos) {
                 section(
-                    "Illusion strength (density " + combo.density + ", outline " + combo.outline + "px)" +
-                        (isExcluded(DESIGN, combo) ? " &mdash; EXCLUDED from the task" : ""),
+                    "Illusion strength (density " + combo.density + ", outline " + combo.outline + ")" +
+                        (isExcluded(DESIGN, combo) ? " &mdash; " + excludedWhy(combo) : ""),
                     "All " + DESIGN.illusion_strength.length + " strength levels, difference 0.1 (left larger).",
                     3,
                     DESIGN.illusion_strength.map((s) => Object.assign({ illusion_strength: s }, combo))
@@ -91,7 +113,7 @@
             // 3. Difference: smallest to largest, both signs
             section(
                 "Difference",
-                "All " + DESIGN.difference.length + " levels, positive (left larger) then negative. Strength 1, density " + base.density + ", outline " + base.outline + "px.",
+                "All " + DESIGN.difference.length + " levels, positive (left larger) then negative. Strength 1, density " + base.density + ", outline " + base.outline + ".",
                 3,
                 DESIGN.difference.flatMap((d) => [{ difference: d }, { difference: -d }])
             )

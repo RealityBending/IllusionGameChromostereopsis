@@ -287,23 +287,40 @@ const Experiment = (() => {
     }
 
     // --- Blocks ---------------------------------------------------------------------------------
+    // Task 1 accuracy and mean RT, shown on the end screen only: not on the break screens, so that
+    // participants do not change how they judge size to raise their score (the illusion lowers it).
+    // Empty when there are no trials (a `?task=2` test run).
     function summary(items) {
+        if (!items.length) return ""
         const accuracy = items.filter((t) => t.correct).length / items.length
         const rt = items.reduce((s, t) => s + t.rt, 0) / items.length
-        return "<p>Accuracy: <b>" + Math.round(accuracy * 100) + "%</b>, average response time: <b>" +
-            Math.round(rt) + " ms</b>.</p>"
+        return "<p>For task 1, your accuracy was <b>" + Math.round(accuracy * 100) +
+            "%</b> and your average response time was <b>" + Math.round(rt) + " ms</b>.</p>"
+    }
+
+    // End screen: what the participant saw in task 2, from the red and blue disc trials only (purple
+    // has no colour difference). Percentages of those trials; the rest were "No difference".
+    function depthSummary(items) {
+        const colored = items.filter((t) => t.disc_color !== "purple")
+        if (!colored.length) return ""
+        const pct = (color) => Math.round((100 * colored.filter((t) => t.nearer_color === color).length) / colored.length)
+        return "<p>In task 2, when a red area and a blue area were shown together on a black background, you saw " +
+            "<b>red in front of blue " + pct("red") + "%</b> of the time, and <b>blue in front of red " +
+            pct("blue") + "%</b> of the time.</p>" +
+            "<p>When viewing colours on a flat screen, many people perceive depth between those colours. " +
+            "This is a known effect called <b>chromostereopsis</b>, and is most pronounced when viewing red " +
+            "next to blue.</p>"
     }
 
     async function runBlocks() {
         show("screen-trial")
+        document.getElementById("size-responses").style.display = "flex"
         for (let block = 1; block <= DESIGN.n_blocks; block++) {
             const blockTrials = trials.filter((t) => t.block === block)
-            document.getElementById("progress-label").textContent = "Block " + block + " / " + DESIGN.n_blocks
+            document.getElementById("progress-label").textContent = "Task 1"
             for (const trial of blockTrials) await runTrial(trial, blockTrials.length)
             if (block < DESIGN.n_blocks) {
                 document.getElementById("break-text").innerHTML =
-                    "<p>Block " + block + " of " + DESIGN.n_blocks + " done.</p>" +
-                    summary(log.trials.filter((t) => t.block === block)) +
                     "<p>Take a short break. " +
                     (isTouch ? "<b>Tap the screen</b>" : "Press <b>space</b>") +
                     " when you are ready to continue.</p>"
@@ -313,6 +330,7 @@ const Experiment = (() => {
                 show("screen-trial")
             }
         }
+        document.getElementById("size-responses").style.display = "none"
     }
 
     // --- Task 2: depth task --------------------------------------------------------------------
@@ -548,7 +566,8 @@ const Experiment = (() => {
         sessionInfo()
         const json = JSON.stringify(log, null, 2)
         const name = FILENAME.replace(/\.json$/, "") // the downloads carry the deposit's name
-        document.getElementById("end-summary").innerHTML = summary(log.trials)
+        document.getElementById("end-summary").innerHTML =
+            summary(log.trials) + depthSummary(log.depth_trials)
         document.getElementById("data-preview").value = json
         document.getElementById("download-json").onclick = () => download(name + ".json", json, "application/json")
         document.getElementById("download-csv").onclick = () => download(name + ".csv", toCSV(flatRows()), "text/csv")
@@ -595,7 +614,6 @@ const Experiment = (() => {
                 illusion_strength: DESIGN.illusion_strength, factors: DESIGN.factors, fixed: DESIGN.fixed,
                 fixation_duration: DESIGN.fixation_duration, mask: DESIGN.mask,
                 depth: Object.assign({ n_total: depthTrials.length }, DEPTH_DESIGN) }
-            document.getElementById("n-depth-trials").textContent = depthTrials.length
             openSession()
             if (startTask === 1) await runBlocks()
             await runDepth()
@@ -603,7 +621,6 @@ const Experiment = (() => {
         }
         document.getElementById("instructions-button").onclick = begin
         document.getElementById("n-trials").textContent = DESIGN.n_total
-        document.getElementById("n-blocks").textContent = DESIGN.n_blocks
         if (startTask === 2) begin()
         else show("screen-consent")
     }

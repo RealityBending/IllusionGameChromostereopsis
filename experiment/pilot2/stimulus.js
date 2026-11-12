@@ -9,7 +9,8 @@
 // (positive = left larger), defined as in Pyllusion's Delboeuf.
 //
 // Pilot 2 adds one option not in Pyllusion: `outline`, a solid coloured outline in the disc's own colour at its
-// edge (in pixels, 0 = none, i.e. Pyllusion's behaviour), so the disc keeps a crisp edge at low density.
+// edge (width in the same units as `gap`, 0 = none, i.e. Pyllusion's behaviour), so the disc keeps a
+// crisp edge at low density.
 //
 // Geometry uses Pyllusion's grid units: sizes are a proportion of the canvas height (2 = full height),
 // positions run from -1 to 1 across the width.
@@ -97,7 +98,7 @@ const Chromostereopsis = (() => {
         density_inner: null,
         dither_size: 2,
         dither_shared: true,
-        outline: 0, // pixels of solid disc colour at the disc's edge (not in Pyllusion)
+        outline: 0, // width of solid disc colour at the disc's edge, in `gap`'s units (not in Pyllusion)
         seed: null,
     }
 
@@ -196,7 +197,7 @@ const Chromostereopsis = (() => {
 
         // Predicted mean luminance of each panel (analytic, from areas and densities)
         // The coloured outline is solid, so it counts at full density
-        const outlineRelative = (2 * o.outline) / sizePanelPx
+        const outlineRelative = (2 * o.outline) / sizePanel
         const panelLuminance = (radius, lumInner, lumSurround) => {
             const areaDisc = discArea(radius) / 4
             const areaOutline = areaDisc - discArea(Math.max(radius - outlineRelative, 0)) / 4
@@ -370,7 +371,7 @@ const Chromostereopsis = (() => {
                 (params.Gap / 2) * height,
                 params.Density,
                 params.Density_Inner,
-                params.Outline || 0,
+                ((params.Outline || 0) / 2) * height,
                 dith
             )
         }

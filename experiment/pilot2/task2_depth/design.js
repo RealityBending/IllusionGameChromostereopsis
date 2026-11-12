@@ -9,38 +9,36 @@
 // of interest in itself). Run after the size task so that the size judgements are made before
 // participants know the study is about depth. Notes: AGENTS.md > Measuring perceived depth.
 //
-// Kept short and simple: full-strength red and blue discs, and strength 0 (disc and surround the same
-// purple), solid (density 1, no dither) and no outline. As only the left panel is shown, the sign of
+// Kept short and simple: full-strength red and blue discs only, solid (density 1, no dither), no
+// outline, task 1's gap. As only the left panel is shown, the sign of
 // the strength is the disc's colour (positive = red disc on blue). Dither is not varied here: in the
 // main experiment, task 2 can use whichever dither gives the strongest effect in task 1.
 //
-// Disc size varies (0.5, 0.75, 1; task 1 uses 0.5), so that fewer trials are identical repeats.
-// There are likely too few trials per size to test a difference between sizes.
+// Disc size varies (0.5, as task 1, and 1) so that a colour can come up twice in a row without
+// repeating the same image: with one size, the no-repeat rule below would force red and blue to
+// alternate, a pattern participants could answer by. Too few trials per size to compare sizes.
 //
-// 21 red + 21 blue discs to classify each participant's depth direction. Strength 0 gives the
-// figure-in-front bias, which the red vs blue comparison already cancels, so it is only a check and
-// gets fewer: 3 sizes x (7 + 2 + 7) = 48 trials. No time limit: the stimulus stays until the
-// response (RT is still recorded).
+// 2 sizes x (6 red + 6 blue) = 24 trials to classify each participant's depth direction (48 before,
+// with purple trials: too long, about 8 minutes). Figures tend to look in front of their ground, but
+// the red vs blue comparison cancels that. No time limit: the stimulus stays until the response (RT
+// is still recorded).
 
 const DEPTH_DESIGN = {
-    n_reps: { "-1": 7, 0: 2, 1: 7 }, // per strength level and size; a number = the same for all
-    illusion_strength: [-1, 0, 1],
-    factors: { size: [0.5, 0.75, 1] }, // fully crossed with strength; varied, not planned as a test
+    n_reps: 6, // per strength level and size; or an object giving it per strength level
+    illusion_strength: [-1, 1], // no 0: see above
+    factors: { size: [0.5, 1] }, // fully crossed with strength; varied, not planned as a test
     // Overrides DESIGN.fixed. Solid discs: dither is tested in task 1, and the main experiment's
     // task 2 can use whichever dither works best there. (Disc sizes: equal disc and surround areas
-    // at about 1.06; the largest that fits with the gap is about 1.29.)
+    // at about 1.06.)
     fixed: { density: 1, outline: 0 },
     difference: 0, // discs the same size (it would only matter for the hidden panel anyway)
 
     // Trial order (see orderDepthTrials):
     // - never the same trial twice in a row (same colour and size: with solid discs, the same image);
-    // - at most `max_run` trials in a row with the same disc colour (red, blue or purple), so that
-    //   repeating the last answer cannot pass for a consistent percept;
-    // - no purple trial (strength 0: circle and surround the same colour, so the question can seem
-    //   not to make sense, which is confusing before any coloured trial) before
-    //   `colored_before_purple` red disc and as many blue disc trials have been shown.
+    // - at most `max_run` trials in a row with the same disc colour, so that repeating the last
+    //   answer cannot pass for a consistent percept.
+    // (orderDepthTrials also supports `colored_before_purple`, for designs with strength 0 trials.)
     max_run: 2,
-    colored_before_purple: 1,
 }
 
 // --- Trial list --------------------------------------------------------------------------------
